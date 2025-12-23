@@ -1,0 +1,2 @@
+/Users/aswin/development/Resume-Builder-rushi/android/app/.cxx/Debug/424y72s6/x86/CMakeFiles/edit_cache.dir
+/Users/aswin/development/Resume-Builder-rushi/android/app/.cxx/Debug/424y72s6/x86/CMakeFiles/rebuild_cache.dir
