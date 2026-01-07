@@ -271,7 +271,7 @@ class CoverLetter4{
               margin: EdgeInsets.zero,
               decoration: BoxDecoration(
                 // borderRadius: BorderRadius.circular(20),
-                image: DecorationImage(image: borderImg!,fit: BoxFit.cover),
+                image: DecorationImage(image: borderImg,fit: BoxFit.cover),
                 // border: Border.all(
                 //     width: 2,
                 //     // color: PdfColor(0.8705882352941177, 0.7490196078431373,

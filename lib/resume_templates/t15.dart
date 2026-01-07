@@ -42,17 +42,20 @@ class Template15 {
   List<SectionModel> sectionData = [];
 
   Template15({required Resume15ThemeModel? resume15theme}) {
-    subHeaderColor = resume15theme?.subHeaderColor ?? PdfColor.fromHex("#1E3A8A");
+    subHeaderColor =
+        resume15theme?.subHeaderColor ?? PdfColor.fromHex("#1E3A8A");
     headerColor = resume15theme?.headerColor ?? PdfColor.fromHex("#1E3A8A");
     nameColor = resume15theme?.nameColor ?? PdfColor.fromHex("#1E3A8A");
-    normalTextColor = resume15theme!.normalTextColor ?? PdfColor.fromHex("#000000");
-    bullet53 = resume15theme.bullet53!;
-    background = resume15theme.back53 ?? PdfAssets.back53;
-    emailIc = resume15theme.emailIc ?? PdfAssets.email53;
-    phoneIc = resume15theme.phoneIc ?? PdfAssets.phone53;
-    linkIc = resume15theme.linkIc ?? PdfAssets.link53;
-    normalFont = resume15theme.normalFont ?? Font.helvetica();
-    headerFont = resume15theme.headerFont ?? Font.helveticaBold();
+    normalTextColor =
+        resume15theme?.normalTextColor ?? PdfColor.fromHex("#000000");
+    bullet53 = resume15theme?.bullet53;
+    background = resume15theme?.back53 ?? PdfAssets.back53;
+    imageBorder = resume15theme?.imageBorder53 ?? PdfAssets.imageBorder53;
+    emailIc = resume15theme?.emailIc ?? PdfAssets.email53;
+    phoneIc = resume15theme?.phoneIc ?? PdfAssets.phone53;
+    linkIc = resume15theme?.linkIc ?? PdfAssets.link53;
+    normalFont = resume15theme?.normalFont ?? Font.helvetica();
+    headerFont = resume15theme?.headerFont ?? Font.helveticaBold();
   }
 
   Future<bool> _initializeDataAndAssets() async {
@@ -99,12 +102,16 @@ class Template15 {
 
       final imageFutures = <Future>[];
 
+      if (imageBorder != null && imageBorder!.isNotEmpty) {
+        imageFutures.add(rootBundle.load(imageBorder!).then(
+            (data) => imageBorder53 = MemoryImage(data.buffer.asUint8List())));
+      }
+
       if (bullet53 != null && bullet53!.isNotEmpty) {
         imageFutures.add(rootBundle.load(bullet53!).then((byteData) {
           bulletImage = MemoryImage(byteData.buffer.asUint8List());
         }));
       }
-
       if (emailIc != null && emailIc!.isNotEmpty) {
         imageFutures.add(rootBundle
             .load(emailIc!)
@@ -165,11 +172,12 @@ class Template15 {
     print(" Template15: educationData.length=${educationData.length}");
     print(" Template15: sectionData.length=${sectionData.length}");
 
-    final pdf = Document();
+   final pdf = Document();
 
-    print(" Template15: All widgets built successfully");
+    print(" Template13: All widgets built successfully");
 
-    pdf.addPage(MultiPage(
+    pdf.addPage(
+      Page(
         pageTheme: PageTheme(
             margin: EdgeInsets.zero,
             pageFormat: PdfPageFormat.a4,
@@ -182,37 +190,52 @@ class Template15 {
                   : Container(color: PdfColors.grey100);
             }),
         build: (Context context) {
-          return [_buildSinglePageLayout()];
-        }));
+          return _buildSinglePageLayout();
+        }),
+    );
 
     try {
       final outputDir = await getApplicationDocumentsDirectory();
       final String timestamp =
           DateTime.now().toIso8601String().replaceAll(':', '-');
-      final file = File("${outputDir.path}/Resume_T15_$timestamp.pdf");
+      final file = File("${outputDir.path}/Resume_T13_$timestamp.pdf");
       await file.writeAsBytes(await pdf.save());
       print("Pdf Saved To ${file.path}");
       return file;
     } catch (e) {
-      print('Failed to save PDF for Template15: $e');
+      print('Failed to save PDF for Template13: $e');
       return null;
     }
   }
 
   String _truncateTitle(String title) {
-    const int maxChars = 12;
+    const int maxChars = 12; 
     if (title.length <= maxChars) {
       return title;
     }
     return title.substring(0, maxChars - 3) + '...';
   }
 
+
   Widget _buildSinglePageLayout() {
     final name =
         "${introData?.firstName ?? ""} ${introData?.lastName ?? ""}".trim();
     final List<Widget> leftColumnItems = [];
     final List<Widget> rightColumnItems = [];
+    // Identify and extract the Projects section
+    SectionModel? projectsSection;
+    final List<SectionModel> otherSections = [];
 
+    for (final section in sectionData) {
+      if (section.id.toLowerCase() == 'projects' ||
+          section.id == AppStrings.projects) {
+        projectsSection = section;
+      } else {
+        otherSections.add(section);
+      }
+    }
+
+    // Add name to right column at the top
     rightColumnItems.add(
       Container(
         padding: EdgeInsets.only(top: 60, bottom: 20, right: 40, left: 20),
@@ -222,7 +245,7 @@ class Template15 {
             Text(
               name.isEmpty ? "Your Name" : name,
               textAlign: TextAlign.right,
-              style: TextStyle(
+              style: TextStyle(    
                 color: nameColor,
                 font: headerFont,
                 fontSize: 30,
@@ -234,18 +257,18 @@ class Template15 {
       ),
     );
 
-    leftColumnItems.add(
+   leftColumnItems.add(
       Container(
-        padding: EdgeInsets.only(top: 60, bottom: 20, right: 40, left: 40),
+        padding: EdgeInsets.only(top: 40, bottom: 5, right: 40, left: 25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (profileImage != null)
+            if (imageBorder != null)
               Container(
                 width: 120,
                 height: 120,
                 padding:
-                    imageBorder53 != null ? EdgeInsets.all(8) : EdgeInsets.zero,
+                    imageBorder53 != null ? EdgeInsets.all(5) : EdgeInsets.zero,
                 decoration: imageBorder53 != null
                     ? BoxDecoration(
                         image: DecorationImage(
@@ -256,11 +279,11 @@ class Template15 {
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                        width: 15, color: PdfColor.fromHex("#A4BC89")),
+                        width: 15, color: PdfColor.fromHex("#7FA3C8")),
                     shape: BoxShape.circle,
                   ),
                   child:
-                      ClipOval(child: Image(profileImage!, fit: BoxFit.cover)),
+                      ClipOval(child: Image(imageBorder53!, fit: BoxFit.cover)),
                 ),
               ),
           ],
@@ -268,35 +291,49 @@ class Template15 {
       ),
     );
 
-    leftColumnItems.add(
-      Padding(
-        padding: EdgeInsets.fromLTRB(50, 5, 20, 5),
-        child: _buildRotatedSection(
-          title: AppStrings.t2,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (emailIc != null)
-                _buildContactRow(email_53!, contactData?.email),
-              if (phoneIc != null)
-                _buildContactRow(phone_53!, contactData?.phone),
-              if (linkIc != null)
-                _buildContactRow(link_53!, contactData?.personnelWeb),
-            ],
-          ),
-        ),
-      ),
-    );
-
+         leftColumnItems.add(
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 3, 20, 5),
+              child: _buildRotatedSection(
+                title: AppStrings.t2, // CONTACT
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (emailIc != null && email_53 != null)
+                      _buildContactRow(email_53!, contactData?.email),
+                    if (phoneIc != null && phone_53 != null)
+                      _buildContactRow(phone_53!, contactData?.phone),
+                    if (linkIc != null && link_53 != null)
+                      _buildContactRow(link_53!, contactData?.socialMediaUrl1),
+                    if (linkIc != null && link_53 != null)
+                      _buildContactRow(link_53!, contactData?.socialMediaUrl2),
+                    if (contactData?.addr1?.isNotEmpty ?? false)
+                      Text(
+                        contactData!.addr1!,
+                        style: TextStyle(fontSize: 7, color: normalTextColor),
+                      ),
+                    if (contactData?.addr2?.isNotEmpty ?? false)
+                      Text(
+                        contactData!.addr2!,
+                        style: TextStyle(fontSize: 7, color: normalTextColor),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+          
     for (int i = 0; i < sectionData.length; i++) {
       if (i % 2 == 0) {
-        // left-side only
-        leftColumnItems.add(
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 20, 20, 5),
-            child: _buildRotatedSectionFromModel(sectionData[i]),
-          ),
-        );
+        if (sectionData[i].id.toLowerCase() != 'projects' && 
+            sectionData[i].id != AppStrings.projects) {
+          leftColumnItems.add(
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 5, 20, 5),
+              child: _buildRotatedSectionFromModel(sectionData[i]),
+            ),
+          );
+        }
       }
     }
 
@@ -324,8 +361,7 @@ class Template15 {
             title: AppStrings.t3,
             items: educationData
                 .map(
-                  (edu) =>
-                      "${edu.schoolName ?? ''}\n[${edu.dateFrom ?? ''} - ${edu.present == true ? 'Present' : edu.dateTo ?? ''}]",
+                  (edu) =>  "${edu.schoolName ?? ''}\n[${edu.dateFrom ?? ''} - ${edu.present == true ? 'Present' : edu.dateTo ?? ''}]",
                 )
                 .toList(),
             bottomPadding: 3.0,
@@ -338,29 +374,32 @@ class Template15 {
       rightColumnItems.add(
         Padding(
           padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
-          child: _buildRightColumnSection(
-            title: AppStrings.t4,
-            items: workData
-                .map(
-                  (work) =>
-                      "${work.compName ?? ''}, ${work.compLocation ?? ''}\nPosition: ${work.compPosition ?? ''}\nDuration: ${work.present == true ? '[${work.dateFrom ?? ''}] - Present' : '[${work.dateFrom ?? ''} - ${work.dateTo ?? ''}]'}",
-                )
-                .toList(),
-            bottomPadding: 3.0,
-          ),
+          child: _buildWorkSection(),
+        ),
+      );
+    }
+
+    if (projectsSection != null) {
+      rightColumnItems.add(
+        Padding(
+          padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
+          child: _buildProjectSection(projectsSection),
         ),
       );
     }
 
     for (int i = 0; i < sectionData.length; i++) {
       if (i % 2 == 1) {
-        rightColumnItems.add(
-          Padding(
-            padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
-            child: _buildRightColumnSectionFromModel(sectionData[i],
-                headerSpacing: 3.0),
-          ),
-        );
+        if (sectionData[i].id.toLowerCase() != 'projects' && 
+            sectionData[i].id != AppStrings.projects) {
+          leftColumnItems.add(
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 5, 20, 5),
+              child: _buildRightColumnSectionFromModel(sectionData[i],
+                  headerSpacing: 3.0),
+            ),
+          );
+        }
       }
     }
 
@@ -370,19 +409,21 @@ class Template15 {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Left Column
-          Expanded(
+          Flexible(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: leftColumnItems,
             ),
           ),
           SizedBox(width: 15),
           // Right Column
-          Expanded(
+          Flexible(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: rightColumnItems,
             ),
           ),
@@ -390,6 +431,7 @@ class Template15 {
       ),
     );
   }
+
 
   Widget _buildContactRow(MemoryImage icon, String? text) {
     if (text == null || text.isEmpty) return Container();
@@ -423,8 +465,7 @@ class Template15 {
   Widget _getParagraph({required String text}) {
     return Text(text,
         textAlign: TextAlign.justify,
-        style:
-            TextStyle(color: normalTextColor, fontSize: 7, font: normalFont));
+        style: TextStyle(color: normalTextColor, fontSize: 7, font: normalFont));
   }
 
   // Clean up any control / replacement characters and normalize whitespace
@@ -469,8 +510,7 @@ class Template15 {
       ]),
     );
   }
-
-  Widget _buildRotatedSection({
+    Widget _buildRotatedSection({
     required String title,
     required Widget content,
   }) {
@@ -503,26 +543,154 @@ class Template15 {
             .where((s) => s.isNotEmpty)
             .toList() ??
         [];
+    final List<String> descriptions = sectionModel.description
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .toList() ??
+        [];
 
-    final MemoryImage? bulletToUse = bulletImage;
     return _buildRotatedSection(
       title: sectionModel.id,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final item in items)
+          for (int i = 0; i < items.length; i++)
             Padding(
-              padding: const EdgeInsets.only(bottom: 3.0),
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (bulletToUse != null)
-                  Image(bulletToUse, width: 4, height: 4),
-                SizedBox(width: 5),
-                Expanded(child: _getNormalText4(text: item)),
-              ]),
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    items[i],
+                    style: TextStyle(
+                      color: normalTextColor,
+                      fontSize: 10,
+                      font: headerFont,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  if (i < descriptions.length && descriptions[i].isNotEmpty) ...[
+                    SizedBox(height: 2),
+                    for (final d in descriptions[i]
+                        .split(RegExp(r'[\n@]+'))
+                        .map((s) => s.trim())
+                        .where((s) => s.isNotEmpty))
+                      _getNormalText4(text: d),
+                  ]
+                ],
+              ),
             ),
         ],
       ),
     );
+  }
+
+  Widget _buildWorkSection() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _getHeaderText4Dark(text: AppStrings.t4),
+      SizedBox(height: 4),
+      for (final work in workData)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (((work.compPosition ?? '').trim()).isNotEmpty)
+                Text(
+                  (work.compPosition ?? '').trim(),
+                  style: TextStyle(
+                    color: normalTextColor,
+                    fontSize: 10,
+                    font: headerFont,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              if (((work.compName ?? '').trim()).isNotEmpty ||
+                  ((work.compLocation ?? '').trim()).isNotEmpty)
+                Text(
+                  [
+                    (work.compName ?? '').trim(),
+                    (work.compLocation ?? '').trim(),
+                  ].where((s) => s.isNotEmpty).join(' | '),
+                  style: TextStyle(
+                    color: normalTextColor,
+                    fontSize: 9,
+                    font: normalFont,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              Text(
+                (work.present ?? false)
+                    ? "${(work.dateFrom ?? '').trim()} - Present"
+                    : "${(work.dateFrom ?? '').trim()} - ${(work.dateTo ?? '').trim()}",
+                style: TextStyle(
+                  color: normalTextColor,
+                  fontSize: 8,
+                  font: normalFont,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (((work.details ?? '').trim()).isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in (work.details ?? '')
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _getNormalText4(text: d),
+              ]
+            ],
+          ),
+        ),
+      SizedBox(height: 8),
+    ]);
+  }
+  Widget _buildProjectSection(SectionModel projectSection) {
+    final List<String> projectNames = projectSection.value
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList() ??
+        [];
+    final List<String> projectDescriptions = projectSection.description
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .toList() ??
+        [];
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _getHeaderText4Dark(text: projectSection.id),
+      SizedBox(height: 4),
+      for (int i = 0; i < projectNames.length; i++)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                projectNames[i],
+                style: TextStyle(
+                  color: normalTextColor,
+                  fontSize: 10,
+                  font: headerFont,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (i < projectDescriptions.length &&
+                  projectDescriptions[i].isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in projectDescriptions[i]
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _getNormalText4(text: d),
+              ]
+            ],
+          ),
+        ),
+      SizedBox(height: 8),
+    ]);
   }
 }

@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:resume_builder/Presentation/resources/route_manager.dart';
-
 import 'package:resume_builder/screens/enhanced_download_screen.dart';
 import 'package:resume_builder/google_ads/ads.dart';
-
 import 'package:resume_builder/my_singleton.dart';
-
 import '../../../google_ads/adunits.dart';
 import '../../resources/assets_manager.dart';
 import '../../resources/color_manager.dart';
@@ -94,7 +91,7 @@ class _TemplateTabViewState extends State<TemplateTabView> {
                         ),
                       ),
                       GridView.count(
-                        childAspectRatio: 0.60,
+                        childAspectRatio: 0.52,
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         mainAxisSpacing: 30,
@@ -173,23 +170,13 @@ class _TemplateTabViewState extends State<TemplateTabView> {
         _getTemplateItem(
             item_id: "26", thumbnail: ImageAssets.template26, isPremium: true),
         _getTemplateItem(
-            item_id: "27", thumbnail: ImageAssets.template27, isPremium: true),
+            item_id: "27", thumbnail: ImageAssets.template31, isPremium: true),
         _getTemplateItem(
-            item_id: "28", thumbnail: ImageAssets.template28, isPremium: true),
+            item_id: "28", thumbnail: ImageAssets.template32, isPremium: true),
         _getTemplateItem(
-            item_id: "29", thumbnail: ImageAssets.template29, isPremium: true),
+            item_id: "29", thumbnail: ImageAssets.template33, isPremium: true),
         _getTemplateItem(
-            item_id: "30", thumbnail: ImageAssets.template30, isPremium: false),
-        _getTemplateItem(
-            item_id: "31", thumbnail: ImageAssets.template31, isPremium: true),
-        _getTemplateItem(
-            item_id: "32", thumbnail: ImageAssets.template32, isPremium: true),
-        _getTemplateItem(
-            item_id: "33", thumbnail: ImageAssets.template33, isPremium: true),
-        _getTemplateItem(
-            item_id: "34", thumbnail: ImageAssets.template34, isPremium: false),
-        _getTemplateItem(
-            item_id: "35", thumbnail: ImageAssets.template35, isPremium: true),
+            item_id: "30", thumbnail: ImageAssets.template34, isPremium: false),
       ];
 
   Widget _getTemplateItem(
@@ -201,6 +188,17 @@ class _TemplateTabViewState extends State<TemplateTabView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              AppStrings.templateNames[item_id] ?? "",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: FontSize.s14,
+                  fontWeight: FontWeight.bold,
+                  color: ColorManager.primary),
+            ),
+          ),
           Container(
             height: 230,
             width: double.infinity,

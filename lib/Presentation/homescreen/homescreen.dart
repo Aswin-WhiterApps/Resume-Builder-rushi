@@ -17,6 +17,7 @@ import 'package:resume_builder/constants/colours.dart';
 import 'package:resume_builder/google_ads/ads.dart';
 import 'package:resume_builder/google_ads/adunits.dart';
 import 'package:resume_builder/model/model.dart';
+import 'package:resume_builder/screens/AtsCheckingScreen.dart';
 import 'package:resume_builder/shared_preference/shared_preferences.dart';
 import 'package:resume_builder/my_singleton.dart';
 import '../../firestore/user_firestore.dart';
@@ -74,12 +75,18 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     super.initState();
     _getAllResumes();
     _getCurrentUserDetails();
-    loadBanner();
+    // loadBanner moved to didChangeDependencies
     print("CurrentUserEmail = ${MySingleton.loggedInUser?.email}");
     print("CurrentUserUsername = ${MySingleton.loggedInUser?.userName}");
     print("CurrentUserUID = ${MySingleton.loggedInUser?.uid}");
     print("CurrentUserSubscribed = ${MySingleton.loggedInUser?.subscribed}");
     _getStoragePermission();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadBanner();
   }
 
   Future<void> _getCurrentUserDetails() async {
@@ -91,22 +98,41 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   Future<void> _getAllResumes() async {
     final userId = MySingleton.userId;
-    if (userId == null) { /* handle not logged in */ return; }
+    if (userId == null) {
+      /* handle not logged in */ return;
+    }
     final resumes = await _fireUser.getResumesForUser(userId);
     _streamController.sink.add(resumes);
   }
 
   @override
   void dispose() {
+    _bannerAd?.dispose();
     CreateAd.homescreenBanner.dispose();
     super.dispose();
   }
 
+  bool _isAdLoading = false;
   bool adLoaded = false;
   BannerAd? _bannerAd;
+
   void loadBanner() async {
+    if (adLoaded || _isAdLoading) return;
+    _isAdLoading = true;
+
+    // Get an AnchoredAdaptiveBannerAdSize.
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+            MediaQuery.of(context).size.width.truncate());
+
+    if (size == null) {
+      print('Unable to get height of anchored banner.');
+      _isAdLoading = false;
+      return;
+    }
+
     _bannerAd = BannerAd(
-        size: AdSize.banner,
+        size: size,
         adUnitId: AdUnitId.homeScreenBanner,
         listener: BannerAdListener(onAdLoaded: (ad) {
           print("Homescreen Banner Ad Has been Loaded");
@@ -116,6 +142,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
         }, onAdFailedToLoad: (ad, error) {
           ad.dispose();
           print("Homescreen Banner Ad Has Failed To Load because $error");
+          _isAdLoading = false;
         }),
         request: AdRequest())
       ..load();
@@ -172,14 +199,15 @@ class _HomeScreenViewState extends State<HomeScreenView> {
         bottomSheet: MySingleton.loggedInUser!.subscribed! == false
             ? adLoaded && _bannerAd != null
                 ? SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 80,
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
                     child: AdWidget(ad: _bannerAd!))
                 : Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 80,
+                    height: 50, // Default height placeholder
                     child: Align(
-                        alignment: Alignment.center, child: Text("Loading Ad...")),
+                        alignment: Alignment.center,
+                        child: Text("Loading Ad...")),
                   )
             : Container(
                 height: 0,
@@ -209,11 +237,17 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               padding: const EdgeInsets.all(10.0),
                               child: _getNewResumeBtn(),
                             ),
-                            if (snapshot.data != null && snapshot.data!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: _getAtsCheckingBtn(),
+                            ),
+                            if (snapshot.data != null &&
+                                snapshot.data!.isNotEmpty)
                               for (int i = 0; i < snapshot.data!.length; i++)
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: _getResumeListItem(snapshot.data![i], i),
+                                  child:
+                                      _getResumeListItem(snapshot.data![i], i),
                                 ),
                           ],
                         )
@@ -229,6 +263,10 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                                   Padding(
                                     padding: const EdgeInsets.all(14.0),
                                     child: _getNewResumeBtn(),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(14.0),
+                                    child: _getAtsCheckingBtn(),
                                   ),
                                   if (snapshot.data != null &&
                                       snapshot.data!.isNotEmpty)
@@ -265,7 +303,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           title: Text('Log Out'),
           content: SingleChildScrollView(
             child: Column(
@@ -521,7 +560,6 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       MySingleton.resumeId = newResumeId;
       Navigator.pushNamed(context, Routes.resume_builder);
       _clearTextController();
-
     } catch (e) {
       print("Error in createNewResume flow: $e");
       if (mounted) {
@@ -561,9 +599,12 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     );
 
     AlertDialog alert = AlertDialog(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20))),
       title: const Text("Are You Sure?", style: TextStyle(color: Colors.black)),
-      content: const Text("This action cannot be undone. Tap 'DELETE' to confirm.", style: TextStyle(color: Colors.black)),
+      content: const Text(
+          "This action cannot be undone. Tap 'DELETE' to confirm.",
+          style: TextStyle(color: Colors.black)),
       actions: [
         cancelButton,
         deleteButton,
@@ -614,6 +655,43 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             ),
             Text(
               AppStrings.newResume,
+              style: TextStyle(fontSize: FontSize.s16, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getAtsCheckingBtn() {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AtsCheckingScreen(),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorManager.promo1BgColor,
+          border: Border.all(color: ColorManager.promo1BgColor, width: 2),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.analytics_outlined,
+              color: Colors.white,
+              size: 45,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text(
+              'ATS Checking',
               style: TextStyle(fontSize: FontSize.s16, color: Colors.white),
             ),
           ],

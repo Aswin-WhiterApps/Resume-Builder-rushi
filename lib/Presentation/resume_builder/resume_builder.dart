@@ -327,7 +327,6 @@
 //   }
 // }
 
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -379,8 +378,8 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
   final GlobalKey<EducationTabViewState> _educationTabKey =
       GlobalKey<EducationTabViewState>();
   final GlobalKey<WorkTabViewState> _workTabKey = GlobalKey<WorkTabViewState>();
-  final GlobalKey<SummaryTabViewState> _summaryTabKey = GlobalKey<SummaryTabViewState>();
-
+  final GlobalKey<SummaryTabViewState> _summaryTabKey =
+      GlobalKey<SummaryTabViewState>();
 
   _ResumeBuilderViewState();
 
@@ -429,15 +428,6 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
             inactiveIc: ImageAssets.t6InactiveIc),
         _getTab(
             pos: 6,
-            title: AppStrings.t7,
-            activeIc: MySingleton.loggedInUser!.subscribed!
-                ? ImageAssets.t7ActiveSubscribedIc
-                : ImageAssets.t7ActiveUnubscribedIc,
-            inactiveIc: MySingleton.loggedInUser!.subscribed!
-                ? ImageAssets.t7InactiveSubscribedIc
-                : ImageAssets.t7InactiveUnsubscribedIc),
-        _getTab(
-            pos: 7,
             title: AppStrings.t8,
             activeIc: MySingleton.loggedInUser!.subscribed!
                 ? ImageAssets.t8ActiveSubscribeIc
@@ -446,7 +436,7 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
                 ? ImageAssets.t8InactiveSubscribedIc
                 : ImageAssets.t8InactiveUnsubscribedIc),
         _getTab(
-            pos: 8,
+            pos: 7,
             title: AppStrings.t9,
             activeIc: MySingleton.loggedInUser!.subscribed!
                 ? ImageAssets.t9ActiveSubscribedIc
@@ -454,6 +444,15 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
             inactiveIc: MySingleton.loggedInUser!.subscribed!
                 ? ImageAssets.t9InactiveSubscribedIc
                 : ImageAssets.t9InactiveUnsubscribedIc),
+        _getTab(
+            pos: 8,
+            title: AppStrings.t7,
+            activeIc: MySingleton.loggedInUser!.subscribed!
+                ? ImageAssets.t7ActiveSubscribedIc
+                : ImageAssets.t7ActiveUnubscribedIc,
+            inactiveIc: MySingleton.loggedInUser!.subscribed!
+                ? ImageAssets.t7InactiveSubscribedIc
+                : ImageAssets.t7InactiveUnsubscribedIc),
         _getTab(
             pos: 9,
             title: AppStrings.t10,
@@ -473,9 +472,9 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
         tab4(),
         tab5(),
         tab6(),
-        tab7(),
         tab8(),
         tab9(),
+        tab7(),
         tab10(),
       ];
 
@@ -781,11 +780,12 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
 
       if (currentState is WorkLoaded && currentState.works.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please add at least one work experience.")),
+          const SnackBar(
+              content: Text("Please add at least one work experience.")),
         );
         canProceed = false;
       }
-    }else if (MySingleton.currentIndex == 4) {
+    } else if (MySingleton.currentIndex == 4) {
       final summaryState = _summaryTabKey.currentState;
       if (summaryState == null) {
         canProceed = false;
@@ -793,17 +793,13 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
         summaryState.saveSummary(); // Trigger the save event
         print("Proceeding from Summary tab. Save triggered.");
       }
-    } else if(MySingleton.currentIndex == 5) {
-
+    } else if (MySingleton.currentIndex == 5) {
       List<SectionModel> additionalDetails = MySingleton.additionDetails;
 
-      for(var i in additionalDetails){
+      for (var i in additionalDetails) {
         DbHelper.instance.updateSectionDetails(sectionModel: i, resumeId: id);
       }
-
-
-    }
-    else if (MySingleton.currentIndex == 6) {
+    } else if (MySingleton.currentIndex == 6) {
       // ✅ Cover Letter Tab Validation
       String text = MySingleton.coverLetterController.text.trim();
 

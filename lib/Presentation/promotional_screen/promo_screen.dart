@@ -1,7 +1,6 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:resume_builder/Presentation/resources/assets_manager.dart';
 import 'package:resume_builder/Presentation/resources/color_manager.dart';
 import 'package:resume_builder/Presentation/resources/font_manager.dart';

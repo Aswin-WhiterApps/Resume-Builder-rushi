@@ -1,5 +1,4 @@
-
-class PdfAssets{
+class PdfAssets {
   //For Resume PDF Template 1
   static const TEMP1PATH = "assets/pdf_assets/template1";
   static const bullet11 = "${TEMP1PATH}/bullet11.png";
@@ -32,7 +31,8 @@ class PdfAssets{
   static const bullet31 = "${TEMP3PATH}/bullet31.png";
   static const bullet32 = "${TEMP3PATH}/bullet32.png";
   static const bullet33 = "${TEMP3PATH}/bullet33.png";
-
+  static const t31Horizontal = "${TEMP3PATH}/t31_rect_horizontle.png";
+  static const t31Vertical = "${TEMP3PATH}/t31_rect_verticle.png";
   //For Resume PDF TEMPLATE 4
   static const TEMP4PATH = "assets/pdf_assets/template4";
   static const objV41 = "${TEMP4PATH}/rect41.png";
@@ -58,14 +58,13 @@ class PdfAssets{
   static const back73 = "${TEMP7PATH}/back73.png";
   static const link7 = "${TEMP7PATH}/link7.png";
   static const bullet7 = "${TEMP7PATH}/bullet7.png";
-  static const t31Horizontal = "${TEMP3PATH}/t31_rect_horizontle.png";
-  static const t31Vertical = "${TEMP3PATH}/t31_rect_verticle.png";
+  static const imageBorder71 = "${TEMP13PATH}/border51.png";
 
   //For Resume PDF TEMPLATE 8
   static const TEMP8PATH = "assets/pdf_assets/template8";
-  static const link81 = "${TEMP8PATH}/link81.png";
-  static const link82 = "${TEMP8PATH}/link82.png";
-  static const link83 = "${TEMP8PATH}/link83.png";
+  static const back101 = "${TEMP8PATH}/back101.png";
+  static const back102 = "${TEMP8PATH}/back102.png";
+  static const back103 = "${TEMP8PATH}/back103.png";
   static const back10 = "assets/pdf_assets/template10/back.png";
   static const back11 = "assets/pdf_assets/template11/back.png";
   static const back13 = "assets/pdf_assets/template13/back.png";
@@ -73,9 +72,10 @@ class PdfAssets{
   static const back15 = "assets/pdf_assets/template15/back.png";
   static const t32Horizontal = "${TEMP3PATH}/t32_horizontal.png";
   static const t32Vertical = "${TEMP3PATH}/t32_vertical.png";
-
-  //For Resume PDF TEMPLATE 8 - Additional assets
-  static const bullet81 = "${TEMP8PATH}/bullet81.png";
+  static const link81 = "${TEMP8PATH}/link81.png";
+  static const link82 = "${TEMP8PATH}/link82.png";
+  static const link83 = "${TEMP8PATH}/link83.png";
+  static const bullet81 = "${TEMP7PATH}/bullet7.png";
   static const bullet82 = "${TEMP8PATH}/bullet82.png";
   static const bullet83 = "${TEMP8PATH}/bullet83.png";
   static const back81 = "${TEMP8PATH}/back81.png";
@@ -141,15 +141,14 @@ class PdfAssets{
   static const bullet52 = "${TEMP14PATH}/bullet52.png";
   static const imageBorder52 = "${TEMP14PATH}/border52.png";
 
-
-    //For Resume PDF TEMPLATE 15
+  //For Resume PDF TEMPLATE 15
   static const TEMP15PATH = "assets/pdf_assets/template15";
   static const back53 = "${TEMP15PATH}/back53.png";
   static const email53 = "${TEMP15PATH}/email53.png";
   static const link53 = "${TEMP15PATH}/link53.png";
   static const phone53 = "${TEMP15PATH}/phone53.png";
   static const bullet53 = "${TEMP15PATH}/bullet53.png";
-  static const imageBorder53 = "${TEMP14PATH}/border53.png";
+  static const imageBorder53 = "${TEMP13PATH}/border51.png";
 
   //For Resume PDF TEMPLATE 16
   static const TEMP16PATH = "assets/pdf_assets/template16";
@@ -158,41 +157,39 @@ class PdfAssets{
   static const link54 = "${TEMP16PATH}/link54.png";
   static const phone54 = "${TEMP16PATH}/phone54.png";
   static const bullet54 = "${TEMP16PATH}/bullet54.png";
+  static const imageBorder54 = "${TEMP13PATH}/border51.png";
 
-    //For Resume PDF TEMPLATE 17
+  //For Resume PDF TEMPLATE 17
   static const TEMP17PATH = "assets/pdf_assets/template6";
   static const rect61 = "${TEMP17PATH}/rect61.png";
   static const email61 = "${TEMP17PATH}/email61.png";
   static const link61 = "${TEMP17PATH}/link61.png";
-  static const phone61= "${TEMP17PATH}/phone61.png";
+  static const phone61 = "${TEMP17PATH}/phone61.png";
   static const bullet61 = "${TEMP17PATH}/bullet61.png";
 
-    //For Resume PDF TEMPLATE 18
+  //For Resume PDF TEMPLATE 18
   static const TEMP18PATH = "assets/pdf_assets/template6";
   static const rect62 = "${TEMP18PATH}/rect62.png";
   static const email62 = "${TEMP18PATH}/email62.png";
   static const link62 = "${TEMP18PATH}/link62.png";
-  static const phone62= "${TEMP18PATH}/phone62.png";
+  static const phone62 = "${TEMP18PATH}/phone62.png";
   static const bullet62 = "${TEMP18PATH}/bullet62.png";
 
-    //For Resume PDF TEMPLATE 19
+  //For Resume PDF TEMPLATE 19
   static const TEMP19PATH = "assets/pdf_assets/template6";
   static const rect63 = "${TEMP18PATH}/rect63.png";
   static const email63 = "${TEMP18PATH}/email63.png";
   static const link63 = "${TEMP18PATH}/link63.png";
-  static const phone63= "${TEMP18PATH}/phone63.png";
+  static const phone63 = "${TEMP18PATH}/phone63.png";
   static const bullet63 = "${TEMP18PATH}/bullet63.png";
 
   //For Resume PDF TEMPLATE 20
   static const TEMP20PATH = "assets/pdf_assets/template6";
-  static const email64 = "${TEMP20PATH}/email64.png"; 
+  static const email64 = "${TEMP20PATH}/email64.png";
   static const link64 = "${TEMP20PATH}/link64.png";
-  static const phone64 = "${TEMP20PATH}/phone64.png"; 
+  static const phone64 = "${TEMP20PATH}/phone64.png";
   static const rect64 = "${TEMP20PATH}/rect64.png";
   static const bullet64 = "${TEMP20PATH}/bullet64.png";
-
-
- 
 
   //**************************************************************************
 
@@ -244,7 +241,3 @@ class PdfAssets{
 
   static var t31_rect_vertical;
 }
-
-
-
-

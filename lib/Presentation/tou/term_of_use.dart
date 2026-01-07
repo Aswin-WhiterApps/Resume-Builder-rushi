@@ -3,11 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:resume_builder/Presentation/tou/tou_content.dart';
 
-import '../../my_singleton.dart';
 import '../resources/assets_manager.dart';
 import '../resources/color_manager.dart';
 import '../resources/font_manager.dart';
-import '../resources/route_manager.dart';
 import '../resources/strings_manager.dart';
 import '../resources/values_manager.dart';
 

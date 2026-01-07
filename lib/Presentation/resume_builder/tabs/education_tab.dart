@@ -870,6 +870,18 @@ class EducationTabViewState extends State<EducationTabView> {
                     itemBuilder: (context, index) {
                       EducationModel education = _educationList[index];
 
+                      final String schoolName =
+                          (education.schoolName ?? '').trim();
+                      final String from = (education.dateFrom ?? '').trim();
+                      final String to = ((education.present ?? false)
+                              ? 'Present'
+                              : (education.dateTo ?? ''))
+                          .trim();
+                      final String dateRange = [
+                        if (from.isNotEmpty) from,
+                        if (to.isNotEmpty) to,
+                      ].join(' - ');
+
                       return Container(
                         margin: EdgeInsets.symmetric(vertical: AppPadding.p8),
                         padding: EdgeInsets.all(AppPadding.p12),
@@ -893,12 +905,27 @@ class EducationTabViewState extends State<EducationTabView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                education.schoolName!,
+                                schoolName.isEmpty
+                                    ? AppStrings.whtSchool
+                                    : schoolName,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                     fontSize: FontSize.s20),
                               ),
+                              if (dateRange.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: AppPadding.p8),
+                                  child: Text(
+                                    dateRange,
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: FontSize.s14,
+                                    ),
+                                  ),
+                                ),
                               SizedBox(
                                 height: FontSize.s18,
                               ),
@@ -923,7 +950,7 @@ class EducationTabViewState extends State<EducationTabView> {
                                     child: Text(
                                       AppStrings.delete,
                                       style: TextStyle(
-                                        color: ColorManager.secondary,
+                                        color: Colors.red,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),

@@ -180,7 +180,8 @@ class Template13 {
 
     print(" Template13: All widgets built successfully");
 
-    pdf.addPage(MultiPage(
+    pdf.addPage(
+      Page(
         pageTheme: PageTheme(
             margin: EdgeInsets.zero,
             pageFormat: PdfPageFormat.a4,
@@ -193,8 +194,9 @@ class Template13 {
                   : Container(color: PdfColors.grey100);
             }),
         build: (Context context) {
-          return [_buildSinglePageLayout()];
-        }));
+          return _buildSinglePageLayout();
+        }),
+    );
 
     try {
       final outputDir = await getApplicationDocumentsDirectory();
@@ -224,6 +226,18 @@ class Template13 {
         "${introData?.firstName ?? ""} ${introData?.lastName ?? ""}".trim();
     final List<Widget> leftColumnItems = [];
     final List<Widget> rightColumnItems = [];
+    // Identify and extract the Projects section
+    SectionModel? projectsSection;
+    final List<SectionModel> otherSections = [];
+
+    for (final section in sectionData) {
+      if (section.id.toLowerCase() == 'projects' ||
+          section.id == AppStrings.projects) {
+        projectsSection = section;
+      } else {
+        otherSections.add(section);
+      }
+    }
 
     // Add name to right column at the top
     rightColumnItems.add(
@@ -249,7 +263,7 @@ class Template13 {
 
    leftColumnItems.add(
       Container(
-        padding: EdgeInsets.only(top: 60, bottom: 20, right: 40, left: 40),
+        padding: EdgeInsets.only(top: 40, bottom: 5, right: 40, left: 25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -281,35 +295,49 @@ class Template13 {
       ),
     );
 
-    leftColumnItems.add(
-      Padding(
-        padding: EdgeInsets.fromLTRB(50, 5, 20, 5),
-        child: _buildRotatedSection(
-          title: AppStrings.t2,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (emailIc != null)
-                _buildContactRow(email_51!, contactData?.email),
-              if (phoneIc != null)
-                _buildContactRow(phone_51!, contactData?.phone),
-              if (linkIc != null)
-                _buildContactRow(link_51!, contactData?.personnelWeb),
-            ],
-          ),
-        ),
-      ),
-    );
-
+         leftColumnItems.add(
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 3, 20, 5),
+              child: _buildRotatedSection(
+                title: AppStrings.t2, // CONTACT
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (emailIc != null && email_51 != null)
+                      _buildContactRow(email_51!, contactData?.email),
+                    if (phoneIc != null && phone_51 != null)
+                      _buildContactRow(phone_51!, contactData?.phone),
+                    if (linkIc != null && link_51 != null)
+                      _buildContactRow(link_51!, contactData?.socialMediaUrl1),
+                    if (linkIc != null && link_51 != null)
+                      _buildContactRow(link_51!, contactData?.socialMediaUrl2),
+                    if (contactData?.addr1?.isNotEmpty ?? false)
+                      Text(
+                        contactData!.addr1!,
+                        style: TextStyle(fontSize: 7, color: normalTextColor),
+                      ),
+                    if (contactData?.addr2?.isNotEmpty ?? false)
+                      Text(
+                        contactData!.addr2!,
+                        style: TextStyle(fontSize: 7, color: normalTextColor),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+          
     for (int i = 0; i < sectionData.length; i++) {
       if (i % 2 == 0) {
-        // left-side only
-        leftColumnItems.add(
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 20, 20, 5),
-            child: _buildRotatedSectionFromModel(sectionData[i]),
-          ),
-        );
+        if (sectionData[i].id.toLowerCase() != 'projects' && 
+            sectionData[i].id != AppStrings.projects) {
+          leftColumnItems.add(
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 5, 20, 5),
+              child: _buildRotatedSectionFromModel(sectionData[i]),
+            ),
+          );
+        }
       }
     }
 
@@ -350,28 +378,32 @@ class Template13 {
       rightColumnItems.add(
         Padding(
           padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
-          child: _buildRightColumnSection(
-            title: AppStrings.t4,
-            items: workData
-                .map(
-                  (work) => "${work.compName ?? ''}, ${work.compLocation ?? ''}\nPosition: ${work.compPosition ?? ''}\nDuration: ${work.present == true ? '[${work.dateFrom ?? ''}] - Present' : '[${work.dateFrom ?? ''} - ${work.dateTo ?? ''}]'}",
-                )
-                .toList(),
-            bottomPadding: 3.0,
-          ),
+          child: _buildWorkSection(),
+        ),
+      );
+    }
+
+    if (projectsSection != null) {
+      rightColumnItems.add(
+        Padding(
+          padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
+          child: _buildProjectSection(projectsSection),
         ),
       );
     }
 
     for (int i = 0; i < sectionData.length; i++) {
       if (i % 2 == 1) {
-        rightColumnItems.add(
-          Padding(
-            padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
-            child: _buildRightColumnSectionFromModel(sectionData[i],
-                headerSpacing: 3.0),
-          ),
-        );
+        if (sectionData[i].id.toLowerCase() != 'projects' && 
+            sectionData[i].id != AppStrings.projects) {
+          leftColumnItems.add(
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 5, 20, 5),
+              child: _buildRightColumnSectionFromModel(sectionData[i],
+                  headerSpacing: 3.0),
+            ),
+          );
+        }
       }
     }
 
@@ -381,19 +413,21 @@ class Template13 {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Left Column
-          Expanded(
+          Flexible(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: leftColumnItems,
             ),
           ),
           SizedBox(width: 15),
           // Right Column
-          Expanded(
+          Flexible(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: rightColumnItems,
             ),
           ),
@@ -513,26 +547,154 @@ class Template13 {
             .where((s) => s.isNotEmpty)
             .toList() ??
         [];
+    final List<String> descriptions = sectionModel.description
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .toList() ??
+        [];
 
-    final MemoryImage? bulletToUse = bulletImage;
     return _buildRotatedSection(
       title: sectionModel.id,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final item in items)
+          for (int i = 0; i < items.length; i++)
             Padding(
-              padding: const EdgeInsets.only(bottom: 3.0),
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (bulletToUse != null)
-                  Image(bulletToUse, width: 4, height: 4),
-                SizedBox(width: 5),
-                Expanded(child: _getNormalText4(text: item)),
-              ]),
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    items[i],
+                    style: TextStyle(
+                      color: normalTextColor,
+                      fontSize: 10,
+                      font: headerFont,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  if (i < descriptions.length && descriptions[i].isNotEmpty) ...[
+                    SizedBox(height: 2),
+                    for (final d in descriptions[i]
+                        .split(RegExp(r'[\n@]+'))
+                        .map((s) => s.trim())
+                        .where((s) => s.isNotEmpty))
+                      _getNormalText4(text: d),
+                  ]
+                ],
+              ),
             ),
         ],
       ),
     );
+  }
+
+  Widget _buildWorkSection() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _getHeaderText4Dark(text: AppStrings.t4),
+      SizedBox(height: 4),
+      for (final work in workData)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (((work.compPosition ?? '').trim()).isNotEmpty)
+                Text(
+                  (work.compPosition ?? '').trim(),
+                  style: TextStyle(
+                    color: normalTextColor,
+                    fontSize: 10,
+                    font: headerFont,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              if (((work.compName ?? '').trim()).isNotEmpty ||
+                  ((work.compLocation ?? '').trim()).isNotEmpty)
+                Text(
+                  [
+                    (work.compName ?? '').trim(),
+                    (work.compLocation ?? '').trim(),
+                  ].where((s) => s.isNotEmpty).join(' | '),
+                  style: TextStyle(
+                    color: normalTextColor,
+                    fontSize: 9,
+                    font: normalFont,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              Text(
+                (work.present ?? false)
+                    ? "${(work.dateFrom ?? '').trim()} - Present"
+                    : "${(work.dateFrom ?? '').trim()} - ${(work.dateTo ?? '').trim()}",
+                style: TextStyle(
+                  color: normalTextColor,
+                  fontSize: 8,
+                  font: normalFont,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (((work.details ?? '').trim()).isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in (work.details ?? '')
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _getNormalText4(text: d),
+              ]
+            ],
+          ),
+        ),
+      SizedBox(height: 8),
+    ]);
+  }
+  Widget _buildProjectSection(SectionModel projectSection) {
+    final List<String> projectNames = projectSection.value
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList() ??
+        [];
+    final List<String> projectDescriptions = projectSection.description
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .toList() ??
+        [];
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _getHeaderText4Dark(text: projectSection.id),
+      SizedBox(height: 4),
+      for (int i = 0; i < projectNames.length; i++)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                projectNames[i],
+                style: TextStyle(
+                  color: normalTextColor,
+                  fontSize: 10,
+                  font: headerFont,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (i < projectDescriptions.length &&
+                  projectDescriptions[i].isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in projectDescriptions[i]
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _getNormalText4(text: d),
+              ]
+            ],
+          ),
+        ),
+      SizedBox(height: 8),
+    ]);
   }
 }

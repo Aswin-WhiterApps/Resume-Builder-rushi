@@ -112,6 +112,25 @@ class WorkTabViewState extends State<WorkTabView> {
                     itemCount: state.works.length,
                     itemBuilder: (context, index) {
                       final work = state.works[index];
+
+                      final String companyName = (work.compName ?? '').trim();
+                      final String position = (work.compPosition ?? '').trim();
+                      final String location = (work.compLocation ?? '').trim();
+                      final String from = (work.dateFrom ?? '').trim();
+                      final String to = ((work.present ?? false)
+                              ? 'Present'
+                              : (work.dateTo ?? ''))
+                          .trim();
+                      final String dateRange = [
+                        if (from.isNotEmpty) from,
+                        if (to.isNotEmpty) to,
+                      ].join(' - ');
+                      final String roleLine = [
+                        if (position.isNotEmpty) position,
+                        if (location.isNotEmpty) location,
+                      ].join(' • ');
+                      final String details = (work.details ?? '').trim();
+
                       return Container(
                         margin: const EdgeInsets.symmetric(
                             vertical: AppPadding.p8),
@@ -135,12 +154,55 @@ class WorkTabViewState extends State<WorkTabView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                work.compName ?? 'No Company Name',
+                                companyName.isEmpty
+                                    ? 'No Company Name'
+                                    : companyName,
                                 style: const TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                     fontSize: FontSize.s20),
                               ),
+                              if (roleLine.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: AppPadding.p8),
+                                  child: Text(
+                                    roleLine,
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: FontSize.s14,
+                                    ),
+                                  ),
+                                ),
+                              if (dateRange.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: AppPadding.p4),
+                                  child: Text(
+                                    dateRange,
+                                    style: const TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: FontSize.s12,
+                                    ),
+                                  ),
+                                ),
+                              if (details.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: AppPadding.p8),
+                                  child: Text(
+                                    details,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: FontSize.s12,
+                                    ),
+                                  ),
+                                ),
                               const SizedBox(height: FontSize.s18),
                               Row(
                                 children: [

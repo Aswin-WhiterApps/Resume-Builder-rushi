@@ -51,10 +51,10 @@ class Template5 {
   Template5(
       {required Resume5ThemeModel? resume5themeModel,
       required CL5ThemeModel? cl5themeModel}) {
-    normalTextColor = resume5themeModel?.normalTextColor ?? PdfColors.blue;
-    headerDarkColor = resume5themeModel?.headerDarkColor ?? PdfColors.blue;
-    nameColor = resume5themeModel?.nameColor ?? PdfColors.blue;
-    imageBorder = resume5themeModel?.imageBorder ?? PdfColors.white;
+    normalTextColor = PdfColors.black;
+    headerDarkColor = PdfColors.black;
+    nameColor = PdfColors.black;
+    imageBorder = PdfColors.white;
 
     backgroundAsset = resume5themeModel?.background ?? PdfAssets.back22;
     emailAsset = resume5themeModel?.email;
@@ -62,7 +62,8 @@ class Template5 {
     linkAsset = resume5themeModel?.link;
     bulletAsset = resume5themeModel?.bullet;
     bulletDarkAsset = resume5themeModel?.bulletDark ?? PdfAssets.bullet22dark;
-    bulletLightAsset = resume5themeModel?.bulletLight ?? PdfAssets.bullet22light;
+    bulletLightAsset =
+        resume5themeModel?.bulletLight ?? PdfAssets.bullet22light;
     bulletDark = resume5themeModel?.bulletDark ?? PdfAssets.bullet22dark;
     bulletLight = resume5themeModel?.bulletLight ?? PdfAssets.bullet22light;
 
@@ -172,6 +173,8 @@ class Template5 {
 
     final pdf = Document();
 
+    print(" Template5: All widgets built successfully");
+
     pdf.addPage(MultiPage(
         pageTheme: PageTheme(
             margin: EdgeInsets.zero,
@@ -185,7 +188,7 @@ class Template5 {
                   : Container(color: PdfColors.grey100);
             }),
         build: (Context context) {
-          return [_buildSinglePageLayout()];
+          return _buildLayout();
         }));
 
     try {
@@ -194,7 +197,7 @@ class Template5 {
           DateTime.now().toIso8601String().replaceAll(':', '-');
       final file = File("${outputDir.path}/Resume_T5_$timestamp.pdf");
       await file.writeAsBytes(await pdf.save());
-      print("Template5: PDF saved to ${file.path}");
+      print("Pdf Saved To ${file.path}");
       return file;
     } catch (e) {
       print('Failed to save PDF for Template5: $e');
@@ -202,11 +205,24 @@ class Template5 {
     }
   }
 
-  Widget _buildSinglePageLayout() {
+  List<Widget> _buildLayout() {
     final name =
         "${introData?.firstName ?? ""} ${introData?.lastName ?? ""}".trim();
     final List<Widget> leftColumnItems = [];
     final List<Widget> rightColumnItems = [];
+
+    // Identify and extract the Projects section
+    SectionModel? projectsSection;
+    final List<SectionModel> otherSections = [];
+
+    for (final section in sectionData) {
+      if (section.id.toLowerCase() == 'projects' ||
+          section.id == AppStrings.projects) {
+        projectsSection = section;
+      } else {
+        otherSections.add(section);
+      }
+    }
 
     leftColumnItems.add(
       Container(
@@ -218,20 +234,22 @@ class Template5 {
               Container(
                 width: 100,
                 height: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: imageBorder),
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(child: Image(profileImage!, fit: BoxFit.cover)),
-              )
-            else
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: PdfColors.grey300,
-                  border: Border.all(width: 2, color: imageBorder),
-                  shape: BoxShape.circle,
+                padding:
+                    imageBorder != null ? EdgeInsets.all(5) : EdgeInsets.zero,
+                decoration: imageBorder != null
+                    ? BoxDecoration(
+                        image: DecorationImage(
+                            image: backgroundImage!, fit: BoxFit.cover),
+                        shape: BoxShape.circle,
+                      )
+                    : null,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 10, color: imageBorder),
+                    shape: BoxShape.circle,
+                  ),
+                  child:
+                      ClipOval(child: Image(profileImage!, fit: BoxFit.cover)),
                 ),
               ),
             SizedBox(height: 10),
@@ -254,28 +272,45 @@ class Template5 {
       Padding(
         padding: EdgeInsets.fromLTRB(50, 5, 20, 5),
         child: _buildRotatedSection(
-          title: AppStrings.t2,
+          title: AppStrings.t2, // CONTACT
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (emailIcon != null)
-                _buildContactRow(emailIcon!, contactData?.email),
-              if (phoneIcon != null)
-                _buildContactRow(phoneIcon!, contactData?.phone),
-              if (linkIcon != null)
-                _buildContactRow(linkIcon!, contactData?.personnelWeb),
+              if (emailAsset != null)
+                _buildContactRow(emailIcon!, contactData?.email,
+                    color: PdfColors.white),
+              if (phoneAsset != null)
+                _buildContactRow(phoneIcon!, contactData?.phone,
+                    color: PdfColors.white),
+              if (linkAsset != null)
+                _buildContactRow(linkIcon!, contactData?.socialMediaUrl1,
+                    color: PdfColors.white),
+              if (linkAsset != null)
+                _buildContactRow(linkIcon!, contactData?.socialMediaUrl2,
+                    color: PdfColors.white),
+              if (contactData?.addr1?.isNotEmpty ?? false)
+                Text(
+                  contactData!.addr1!,
+                  style: TextStyle(fontSize: 7, color: PdfColors.white),
+                ),
+              if (contactData?.addr2?.isNotEmpty ?? false)
+                Text(
+                  contactData!.addr2!,
+                  style: TextStyle(fontSize: 7, color: PdfColors.white),
+                ),
             ],
           ),
         ),
       ),
     );
 
-    for (int i = 0; i < sectionData.length; i++) {
+    for (int i = 0; i < otherSections.length; i++) {
       if (i % 2 == 0) {
+        // left-side only
         leftColumnItems.add(
           Padding(
             padding: EdgeInsets.fromLTRB(50, 5, 20, 5),
-            child: _buildRotatedSectionFromModel(sectionData[i]),
+            child: _buildRotatedSectionFromModel(otherSections[i]),
           ),
         );
       }
@@ -288,7 +323,7 @@ class Template5 {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _getHeaderText(text: AppStrings.t5),
+              _getHeaderText4Dark(text: AppStrings.t5),
               SizedBox(height: 5),
               _getParagraph(text: summeryData!.summery!),
             ],
@@ -319,45 +354,47 @@ class Template5 {
       rightColumnItems.add(
         Padding(
           padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
-          child: _buildRightColumnSection(
-            title: AppStrings.t4,
-            items: workData
-                .map(
-                  (work) =>
-                      "${work.compName ?? ''}, ${work.compLocation ?? ''}\nPosition: ${work.compPosition ?? ''}\nDuration: ${work.present == true ? '[${work.dateFrom ?? ''}] - Present' : '[${work.dateFrom ?? ''} - ${work.dateTo ?? ''}]'}",
-                )
-                .toList(),
-            bottomPadding: 3.0,
-          ),
+          child: _buildWorkSection(),
         ),
       );
     }
 
-    for (int i = 0; i < sectionData.length; i++) {
+    if (projectsSection != null) {
+      rightColumnItems.add(
+        Padding(
+          padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
+          child: _buildProjectSection(projectsSection),
+        ),
+      );
+    }
+
+    // Add right column sections (odd indices)
+    for (int i = 0; i < otherSections.length; i++) {
       if (i % 2 == 1) {
         rightColumnItems.add(
           Padding(
             padding: EdgeInsets.fromLTRB(20, 3, 20, 5),
-            child: _buildRightColumnSectionFromModel(sectionData[i]),
+            child: _buildRightColumnSectionFromModel(otherSections[i],
+                headerSpacing: 3.0),
           ),
         );
       }
     }
 
-    return Container(
-      padding: EdgeInsets.all(0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return [
+      Partitions(
         children: [
-          Expanded(
+          // Left Column
+          Partition(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: leftColumnItems,
             ),
           ),
-          SizedBox(width: 15),
-          Expanded(
+          Partition(width: 15, child: SizedBox()),
+          // Right Column
+          Partition(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,11 +402,11 @@ class Template5 {
             ),
           ),
         ],
-      ),
-    );
+      )
+    ];
   }
 
-  Widget _buildContactRow(MemoryImage icon, String? text) {
+  Widget _buildContactRow(MemoryImage icon, String? text, {PdfColor? color}) {
     if (text == null || text.isEmpty) return Container();
     return Padding(
       padding: const EdgeInsets.only(bottom: 3.0),
@@ -379,8 +416,24 @@ class Template5 {
         Expanded(
             child: Text(text,
                 style: TextStyle(
-                    color: normalTextColor, font: normalFont, fontSize: 9))),
+                    color: color ?? normalTextColor,
+                    font: normalFont,
+                    fontSize: 9))),
       ]),
+    );
+  }
+
+  Widget _getNormalText4({required String text, PdfColor? color}) {
+    return Padding(
+      padding: EdgeInsets.only(left: AppPadding.p12, bottom: 2),
+      child: Text(_sanitizeText(text),
+          textAlign: TextAlign.left,
+          softWrap: true,
+          style: TextStyle(
+            color: color ?? normalTextColor,
+            fontSize: 9,
+            font: normalFont,
+          )),
     );
   }
 
@@ -391,59 +444,50 @@ class Template5 {
             TextStyle(color: normalTextColor, fontSize: 7, font: normalFont));
   }
 
-  Widget _getNormalText({required String text}) {
-    return Padding(
-      padding: EdgeInsets.only(left: AppPadding.p12, bottom: 2),
-      child: Text(_sanitizeText(text),
-          textAlign: TextAlign.left,
-          softWrap: true,
-          style: TextStyle(
-            color: normalTextColor,
-            fontSize: 9,
-            font: normalFont,
-          )),
-    );
-  }
-
+  // Clean up any control / replacement characters and normalize whitespace
   String _sanitizeText(String s) {
+    // Remove common replacement characters and control chars
     var out = s.replaceAll(RegExp(r'[\u0000-\u001F\uFFFD]'), ' ');
+    // Collapse multiple whitespace into single space and trim
     out = out.replaceAll(RegExp(r'\s+'), ' ').trim();
     return out;
   }
 
-  Widget _getHeaderText({required String text}) {
+  Widget _getHeaderText4Dark({required String text, PdfColor? color}) {
     return Text(text.toUpperCase(),
         style: TextStyle(
-            color: headerDarkColor,
+            color: color ?? headerDarkColor,
             fontSize: 12,
             font: headerFont,
             fontWeight: FontWeight.bold));
   }
 
+  // For sections in the right column
   Widget _buildRightColumnSection(
       {required String title,
       required List<String> items,
       double bottomPadding = 3.0,
       double headerSpacing = 3.0}) {
-      final MemoryImage? bulletToUse = t5_bulletLight ?? bulletIcon;
+    final MemoryImage? bulletToUse = t5_bulletLight;
     return Padding(
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _getHeaderText(text: title),
+        _getHeaderText4Dark(text: title),
         SizedBox(height: headerSpacing),
         for (final item in items)
           Padding(
             padding: EdgeInsets.only(left: AppPadding.p12, bottom: 4),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              if (bulletToUse != null) Image(bulletToUse, width: 5, height: 5),
+              if (bulletToUse != null) Image(bulletToUse, width: 4, height: 4),
               SizedBox(width: 8),
-              Expanded(child: _getNormalText(text: item)),
+              Expanded(child: _getNormalText4(text: item)),
             ]),
           ),
       ]),
     );
   }
 
+  // For sections in the left column with rotated titles
   Widget _buildRotatedSection({
     required String title,
     required Widget content,
@@ -451,21 +495,60 @@ class Template5 {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _getHeaderText(text: title),
+        _getHeaderText4Dark(text: title),
         SizedBox(height: 4),
         content,
       ],
     );
   }
 
-  Widget _buildRightColumnSectionFromModel(SectionModel sectionModel) {
+  Widget _buildRightColumnSectionFromModel(SectionModel sectionModel,
+      {double headerSpacing = 3.0}) {
     final List<String> items = sectionModel.value
             ?.split('@@@')
             .map((s) => s.trim())
             .where((s) => s.isNotEmpty)
             .toList() ??
         [];
-    return _buildRightColumnSection(title: sectionModel.id, items: items);
+    final List<String> descriptions =
+        sectionModel.description?.split('@@@').map((s) => s.trim()).toList() ??
+            [];
+
+    final MemoryImage? bulletToUse = t5_bulletLight;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3.0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _getHeaderText4Dark(text: sectionModel.id),
+        SizedBox(height: headerSpacing),
+        for (int i = 0; i < items.length; i++)
+          Padding(
+            padding: EdgeInsets.only(left: AppPadding.p12, bottom: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  if (bulletToUse != null)
+                    Image(bulletToUse, width: 4, height: 4),
+                  SizedBox(width: 8),
+                  Expanded(child: _getNormalText4(text: items[i])),
+                ]),
+                if (i < descriptions.length && descriptions[i].isNotEmpty) ...[
+                  SizedBox(height: 2),
+                  for (final d in descriptions[i]
+                      .split(RegExp(r'[\n@]+'))
+                      .map((s) => s.trim())
+                      .where((s) => s.isNotEmpty))
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: _buildBulletedText(text: d),
+                    ),
+                ]
+              ],
+            ),
+          ),
+      ]),
+    );
   }
 
   Widget _buildRotatedSectionFromModel(SectionModel sectionModel) {
@@ -475,26 +558,199 @@ class Template5 {
             .where((s) => s.isNotEmpty)
             .toList() ??
         [];
+    final List<String> descriptions =
+        sectionModel.description?.split('@@@').map((s) => s.trim()).toList() ??
+            [];
 
-    final MemoryImage? bulletToUse = bulletDarkIcon ?? bulletIcon;
+    final MemoryImage? bulletToUse = t5_bulletDark;
     return _buildRotatedSection(
       title: sectionModel.id,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final item in items)
+          for (int i = 0; i < items.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 3.0),
-              child:
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (bulletToUse != null)
-                  Image(bulletToUse, width: 4, height: 4),
-                SizedBox(width: 5),
-                Expanded(child: _getNormalText(text: item)),
-              ]),
+                    if (bulletToUse != null)
+                      Image(bulletToUse, width: 4, height: 4),
+                    SizedBox(width: 5),
+                    Expanded(
+                        child: _getNormalText4(
+                            text: items[i], color: PdfColors.white)),
+                  ]),
+                  if (i < descriptions.length &&
+                      descriptions[i].isNotEmpty) ...[
+                    SizedBox(height: 2),
+                    for (final d in descriptions[i]
+                        .split(RegExp(r'[\n@]+'))
+                        .map((s) => s.trim())
+                        .where((s) => s.isNotEmpty))
+                      Padding(
+                        padding: const EdgeInsets.only(left: 9),
+                        child:
+                            _buildBulletedText(text: d, color: PdfColors.white),
+                      ),
+                  ]
+                ],
+              ),
             ),
         ],
       ),
     );
+  }
+
+  Widget _buildWorkSection() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _getHeaderText1(text: AppStrings.t4),
+      SizedBox(height: 4),
+      for (final work in workData)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (((work.compPosition ?? '').trim()).isNotEmpty)
+                Text(
+                  (work.compPosition ?? '').trim(),
+                  style: TextStyle(
+                    color: normalTextColor,
+                    fontSize: 10,
+                    font: headerFont,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              if (((work.compName ?? '').trim()).isNotEmpty ||
+                  ((work.compLocation ?? '').trim()).isNotEmpty)
+                Text(
+                  [
+                    (work.compName ?? '').trim(),
+                    (work.compLocation ?? '').trim(),
+                  ].where((s) => s.isNotEmpty).join(' | '),
+                  style: TextStyle(
+                    color: normalTextColor,
+                    fontSize: 9,
+                    font: normalFont,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              Text(
+                (work.present ?? false)
+                    ? "${(work.dateFrom ?? '').trim()} - Present"
+                    : "${(work.dateFrom ?? '').trim()} - ${(work.dateTo ?? '').trim()}",
+                style: TextStyle(
+                  color: normalTextColor,
+                  fontSize: 8,
+                  font: normalFont,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (((work.details ?? '').trim()).isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in (work.details ?? '')
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _buildBulletedText(text: d),
+              ]
+            ],
+          ),
+        ),
+      SizedBox(height: 8),
+    ]);
+  }
+
+  Widget _getHeaderText1({required String text}) {
+    return Text(text.toUpperCase(),
+        style: TextStyle(
+          font: headerFont,
+          color: headerDarkColor,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          letterSpacing: -0.2,
+        ));
+  }
+
+  Widget _buildBulletedText({required String text, PdfColor? color}) {
+    final MemoryImage? bulletToUse = t5_bulletDark;
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, bottom: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (bulletToUse != null)
+            Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Image(bulletToUse, width: 4, height: 4))
+          else
+            Text("• ",
+                style: TextStyle(fontSize: 8, color: color ?? normalTextColor)),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: color ?? normalTextColor,
+                fontSize: 9,
+                font: normalFont,
+                letterSpacing: -0.2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProjectSection(SectionModel projectSection) {
+    final List<String> projectNames = projectSection.value
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList() ??
+        [];
+    final List<String> projectDescriptions = projectSection.description
+            ?.split('@@@')
+            .map((s) => s.trim())
+            .toList() ??
+        [];
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _getHeaderText1(text: projectSection.id),
+      SizedBox(height: 4),
+      for (int i = 0; i < projectNames.length; i++)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                projectNames[i],
+                style: TextStyle(
+                  color: normalTextColor,
+                  fontSize: 10,
+                  font: headerFont,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (i < projectDescriptions.length &&
+                  projectDescriptions[i].isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in projectDescriptions[i]
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _buildBulletedText(text: d),
+              ]
+            ],
+          ),
+        ),
+      SizedBox(height: 8),
+    ]);
   }
 }

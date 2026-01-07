@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:resume_builder/firestore/user_firestore.dart';
 import 'package:resume_builder/model/model.dart';
 import 'package:resume_builder/my_singleton.dart';

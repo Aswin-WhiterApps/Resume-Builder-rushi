@@ -6,11 +6,8 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:printing/printing.dart';
 
 import '../DB/db.dart';
-import '../Presentation/resources/assets_manager.dart';
-import '../Presentation/resources/strings_manager.dart';
 import '../model/model.dart';
 import '../model/resume_theme_model.dart';
 import '../my_singleton.dart';

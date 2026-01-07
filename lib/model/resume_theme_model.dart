@@ -218,11 +218,21 @@ class Resume7ThemeModel {
   PdfColor? boxColor;
 
   String? bullet;
+  String? objHorizontal;
+  String? objVertical;
+  String? emailIc;
+  String? phoneIc;
+  String? linkIc;
 
   Resume7ThemeModel(
       {this.background,
       this.link,
       this.bullet,
+      this.objHorizontal,
+      this.objVertical,
+      this.emailIc,
+      this.phoneIc,
+      this.linkIc,
       this.normalFont,
       this.headerFont,
       this.nameFont,
@@ -242,7 +252,9 @@ class Resume8ThemeModel {
   Font? normalFont;
   Font? headerFont;
   Font? nameFont;
-
+  String? emailIc;
+  String? phoneIc;
+  String? linkIc;
   PdfColor? normalTextColor;
   PdfColor? headerDarkColor;
   PdfColor? headerLightColor;
@@ -255,7 +267,9 @@ class Resume8ThemeModel {
   PdfColor? boxColor;
 
   Resume8ThemeModel(
-      {this.link,
+      {this.linkIc,
+      this.emailIc,
+      this.phoneIc,
       this.normalFont,
       this.headerFont,
       this.nameFont,
@@ -275,28 +289,43 @@ class Resume8ThemeModel {
 }
 
 class Resume9ThemeModel {
-  Font? font;
-
+  String? link;
+  Font? normalFont;
+  Font? headerFont;
+  Font? nameFont;
+  String? emailIc;
+  String? phoneIc;
+  String? linkIc;
   PdfColor? normalTextColor;
-  PdfColor? headerColor;
+  PdfColor? headerDarkColor;
+  PdfColor? headerLightColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
   PdfColor? nameColor;
   PdfColor? positionColor;
-  PdfColor? backgroundBoxColor;
-  PdfColor? boxBottomBorderColor;
-  PdfColor? subHeaderColor;
-
-  String? bullet;
+  PdfColor? backgroundColor;
+  PdfColor? imageBorder;
+  PdfColor? boxColor;
 
   Resume9ThemeModel(
-      {this.font,
-      this.headerColor,
-      this.subHeaderColor,
-      this.backgroundBoxColor,
-      this.boxBottomBorderColor,
+      {this.linkIc,
+      this.emailIc,
+      this.phoneIc,
+      this.normalFont,
+      this.headerFont,
+      this.nameFont,
       this.normalTextColor,
+      this.headerDarkColor,
+      // this.headerLightColor,
+      this.dateColor,
+      this.linkColor,
       this.nameColor,
       this.positionColor,
-      this.bullet});
+      this.backgroundColor,
+      this.imageBorder,
+      this.boxColor});
+
+  get bulletDarkImage => null;
 }
 
 class Resume10ThemeModel {
@@ -503,7 +532,7 @@ class Resume15ThemeModel {
   PdfColor? nameColor;
   PdfColor? subHeaderColor;
 
-  String? imageBorder52;
+  String? imageBorder53;
   String? back53;
   String? linkIc;
   String? phoneIc;
@@ -523,7 +552,7 @@ class Resume15ThemeModel {
     this.emailIc,
     this.phoneIc,
     this.linkIc,
-    this.imageBorder52,
+    this.imageBorder53,
     this.back53,
   });
 }
@@ -558,6 +587,7 @@ class Resume16ThemeModel {
     this.phoneIc,
     this.linkIc,
     this.back54,
+    this.imageBorder54,
   });
 }
 
@@ -738,7 +768,362 @@ class Resume21ThemeModel {
   });
 }
 
+class Resume22ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder72;
+  String? rect72;
+  String? linkIc;
+  String? phoneIc;
+  String? emailIc;
+  String? bullet72;
+  String? background;
+
+  Resume22ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet72,
+    this.background,
+    this.emailIc,
+    this.phoneIc,
+    this.linkIc,
+    this.rect72,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+  });
+}
+
+class Resume23ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder73;
+  String? linkIc;
+  String? phoneIc;
+  String? bullet73;
+  String? background;
+
+  Resume23ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet73,
+    this.background,
+    this.linkIc,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+    required String bullet72,
+  });
+}
+
+class Resume24ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder73;
+  String? linkIc;
+  String? phoneIc;
+  String? bullet81;
+  String? background;
+  PdfColor? backgroundColor;
+
+  Resume24ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet81,
+    this.background,
+    this.linkIc,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+    this.backgroundColor,
+  });
+}
+
+class Resume25ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder73;
+  String? linkIc;
+  String? phoneIc;
+  String? bullet82;
+  String? background;
+  PdfColor? backgroundColor;
+
+  Resume25ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet82,
+    this.background,
+    this.linkIc,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+    this.backgroundColor,
+  });
+}
+
+class Resume26ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+  PdfColor? backgroundColor;
+
+  String? imageBorder83;
+  String? linkIc;
+  String? phoneIc;
+  String? bullet83;
+  String? background;
+
+  Resume26ThemeModel(
+      {this.headerFont,
+      this.normalFont,
+      this.headerColor,
+      this.subHeaderColor,
+      this.normalTextColor,
+      this.nameColor,
+      this.bullet83,
+      this.background,
+      this.linkIc,
+      this.positionColor,
+      this.imageBorderColor,
+      this.dateColor,
+      this.linkColor,
+      this.backgroundColor});
+}
+
+class Resume27ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder71;
+  String? rect71;
+  String? linkIc;
+  String? phoneIc;
+  String? emailIc;
+  String? bullet72;
+  String? background;
+
+  Resume27ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet72,
+    this.background,
+    this.emailIc,
+    this.phoneIc,
+    this.linkIc,
+    this.rect71,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+  });
+}
+
+class Resume28ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder71;
+  String? rect71;
+  String? linkIc;
+  String? phoneIc;
+  String? emailIc;
+  String? bullet81;
+  String? background;
+
+  Resume28ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet81,
+    this.background,
+    this.emailIc,
+    this.phoneIc,
+    this.linkIc,
+    this.rect71,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+  });
+}
+
+class Resume29ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder71;
+  String? rect71;
+  String? linkIc;
+  String? phoneIc;
+  String? emailIc;
+  String? bullet81;
+  String? background;
+
+  Resume29ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet81,
+    this.background,
+    this.emailIc,
+    this.phoneIc,
+    this.linkIc,
+    this.rect71,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+  });
+}
+
+class Resume30ThemeModel {
+  Font? headerFont;
+  Font? normalFont;
+
+  PdfColor? normalTextColor;
+  PdfColor? headerColor;
+  PdfColor? nameColor;
+  PdfColor? positionColor;
+  PdfColor? subHeaderColor;
+  PdfColor? imageBorderColor;
+  PdfColor? dateColor;
+  PdfColor? linkColor;
+
+  String? imageBorder71;
+  String? rect71;
+  String? linkIc;
+  String? phoneIc;
+  String? emailIc;
+  String? bullet81;
+  String? background;
+
+  Resume30ThemeModel({
+    this.headerFont,
+    this.normalFont,
+    this.headerColor,
+    this.subHeaderColor,
+    this.normalTextColor,
+    this.nameColor,
+    this.bullet81,
+    this.background,
+    this.emailIc,
+    this.phoneIc,
+    this.linkIc,
+    this.rect71,
+    this.positionColor,
+    this.imageBorderColor,
+    this.dateColor,
+    this.linkColor,
+  });
+}
 //**************************************************************************
+
 class CL1ThemeModel {
   Font? normalFont;
   // Font? headerFont ;

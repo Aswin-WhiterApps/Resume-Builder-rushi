@@ -14,7 +14,17 @@ import 'package:resume_builder/resume_templates/t18.dart' as rt18;
 import 'package:resume_builder/resume_templates/t19.dart' as rt19;
 import 'package:resume_builder/resume_templates/t20.dart' as rt20;
 import 'package:resume_builder/resume_templates/t21.dart' as rt21;
-import 'package:resume_builder/resume_templates/t8.dart';
+import 'package:resume_builder/resume_templates/t22.dart' as rt22;
+import 'package:resume_builder/resume_templates/t23.dart' as rt23;
+import 'package:resume_builder/resume_templates/t24.dart' as rt24;
+import 'package:resume_builder/resume_templates/t25.dart' as rt25;
+import 'package:resume_builder/resume_templates/t26.dart' as rt26;
+import 'package:resume_builder/resume_templates/t27.dart' as rt27;
+import 'package:resume_builder/resume_templates/t28.dart' as rt28;
+import 'package:resume_builder/resume_templates/t29.dart' as rt29;
+import 'package:resume_builder/resume_templates/t30.dart' as rt30;
+import 'package:resume_builder/resume_templates/t8.dart' as rt8;
+import 'package:resume_builder/resume_templates/t9.dart' as rt9;
 import 'package:resume_builder/services/ai_service_manager.dart';
 import 'package:resume_builder/resume_templates/t1.dart' as rt1;
 import 'package:resume_builder/resume_templates/t2.dart' as rt2;
@@ -150,6 +160,9 @@ class PDFGenerationService {
                 resume7themeModel: resumeTheme.resume7theme1,
               );
               final file = await tmpl.createPage();
+              if (file == null) {
+                throw Exception("Template7 generation return null");
+              }
               return file;
             } on ArgumentError catch (e) {
               throw Exception('Template7 validation failed: ${e.message}');
@@ -161,37 +174,46 @@ class PDFGenerationService {
           }
         case '8':
           {
-            print('PDF Service: Starting Template8 (Theme2) generation...');
-            final resumeTheme = Resume8Theme2();
-            await resumeTheme.getModel();
-            print('PDF Service: Theme model loaded');
-
-            final tmpl = Template8(
-              resume8themeModel: resumeTheme.resume8theme2,
-            );
-
-            print('PDF Service: Calling Template8 createPage...');
-            final file = await tmpl.createPage();
-            print('PDF Service: Template8 generated successfully');
-            return file;
+            try {
+              final resumeTheme = Resume8Theme1();
+              await resumeTheme.getModel();
+              final tmpl = rt8.Template8(
+                resume8themeModel: resumeTheme.resume8theme1,
+              );
+              final file = await tmpl.createPage();
+              if (file == null) {
+                throw Exception("Template8 generation return null");
+              }
+              return file;
+            } on ArgumentError catch (e) {
+              throw Exception('Template8 validation failed: ${e.message}');
+            } on StateError catch (e) {
+              throw Exception('Template8 data error: ${e.message}');
+            } catch (e) {
+              throw Exception('Template8 generation failed: $e');
+            }
           }
         case '9':
           {
-            print('PDF Service: Starting Template9 (Theme2) generation...');
-            final resumeTheme = Resume8Theme3();
-            await resumeTheme.getModel();
-            print('PDF Service: Theme model loaded');
-
-            final tmpl = Template8(
-              resume8themeModel: resumeTheme.resume8theme3,
-            );
-
-            print('PDF Service: Calling Template8 createPage...');
-            final file = await tmpl.createPage();
-            print('PDF Service: Template8 generated successfully');
-            return file;
+            try {
+              final resumeTheme = Resume9Theme1();
+              await resumeTheme.getModel();
+              final tmpl = rt9.Template9(
+                resume9themeModel: resumeTheme.resume9theme1,
+              );
+              final file = await tmpl.createPage();
+              if (file == null) {
+                throw Exception("Template9 generation return null");
+              }
+              return file;
+            } on ArgumentError catch (e) {
+              throw Exception('Template9 validation failed: ${e.message}');
+            } on StateError catch (e) {
+              throw Exception('Template9 data error: ${e.message}');
+            } catch (e) {
+              throw Exception('Template9 generation failed: $e');
+            }
           }
-
         case '10':
           {
             final resumeTheme = Resume10Theme1();
@@ -335,7 +357,107 @@ class PDFGenerationService {
             if (file == null) throw Exception('Template21 generation failed');
             return file;
           }
+        case '22':
+          {
+            final resumeTheme = Resume22Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt22.Template22(
+              resume22themeModel: resumeTheme.resume22theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template21 generation failed');
+            return file;
+          }
+        case '23':
+          {
+            final resumeTheme = Resume23Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt23.Template23(
+              resume23themeModel: resumeTheme.resume23theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template23 generation failed');
+            return file;
+          }
+        case '24':
+          {
+            final resumeTheme = Resume24Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt24.Template24(
+              resume24themeModel: resumeTheme.resume24theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template24 generation failed');
+            return file;
+          }
+        case '25':
+          {
+            final resumeTheme = Resume25Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt25.Template25(
+              resume25themeModel: resumeTheme.resume25theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template25 generation failed');
+            return file;
+          }
+        case '26':
+          {
+            final resumeTheme = Resume26Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt26.Template26(
+              resume26themeModel: resumeTheme.resume26theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template26 generation failed');
+            return file;
+          }
+        case '27':
+          {
+            final resumeTheme = Resume27Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt27.Template27(
+              resume27themeModel: resumeTheme.resume27theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template27 generation failed');
+            return file;
+          }
+        case '28':
+          {
+            final resumeTheme = Resume28Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt28.Template28(
+              resume28themeModel: resumeTheme.resume28theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template28 generation failed');
+            return file;
+          }
 
+        case '29':
+          {
+            final resumeTheme = Resume29Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt29.Template29(
+              resume29themeModel: resumeTheme.resume29theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template29 generation failed');
+            return file;
+          }
+
+        case '30':
+          {
+            final resumeTheme = Resume30Theme1();
+            await resumeTheme.getModel();
+            final tmpl = rt30.Template30(
+              resume30themeModel: resumeTheme.resume30theme1,
+            );
+            final file = await tmpl.createPage();
+            if (file == null) throw Exception('Template29 generation failed');
+            return file;
+          }
         default:
           break; // fall through to generic builders
       }

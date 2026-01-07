@@ -17,7 +17,6 @@ class CoverLetterTemplatesView extends StatefulWidget {
 }
 
 class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
-
   @override
   void initState() {
     super.initState();
@@ -31,26 +30,27 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
         bottom: true,
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.only(left: AppSize.s16,
-        right: AppSize.s16,
-        top: AppSize.s16,
-        bottom: MediaQuery.of(context).viewPadding.bottom + 84,
-      ),
+            padding: EdgeInsets.only(
+              left: AppSize.s16,
+              right: AppSize.s16,
+              top: AppSize.s16,
+              bottom: MediaQuery.of(context).viewPadding.bottom + 84,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: AppPadding.p8,
-                        bottom: AppPadding.p20,
-                        top: AppPadding.p8),
-                    child: Text(
-                      AppStrings.templatesHeader,
-                      style: TextStyle(
-                          fontSize: FontSize.s20, fontWeight: FontWeight.bold),
-                    ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: AppPadding.p8,
+                      bottom: AppPadding.p20,
+                      top: AppPadding.p8),
+                  child: Text(
+                    AppStrings.templatesHeader,
+                    style: TextStyle(
+                        fontSize: FontSize.s20, fontWeight: FontWeight.bold),
                   ),
-                  Container(
+                ),
+                Container(
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -85,7 +85,7 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
                           ),
                         ),
                         GridView.count(
-                          childAspectRatio: 0.60,
+                          childAspectRatio: 0.52,
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           mainAxisSpacing: 30,
@@ -100,15 +100,14 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
                     ),
                   ),
                 ),
-                  SizedBox(
-                    height: AppSize.s20,
-                  ),
-                ],
-              ),
+                SizedBox(
+                  height: AppSize.s20,
+                ),
+              ],
             ),
+          ),
         ),
-        ),
-    
+      ),
     );
   }
 
@@ -164,6 +163,17 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              AppStrings.templateNames[item_id.toString()] ?? "",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: FontSize.s14,
+                  fontWeight: FontWeight.bold,
+                  color: ColorManager.primary),
+            ),
+          ),
           Container(
             height: 230,
             width: double.infinity,
@@ -195,8 +205,7 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
               Text(
                 "Download PDF",
                 style: TextStyle(
-                    fontSize: FontSize.s12,
-                    color: ColorManager.secondary),
+                    fontSize: FontSize.s12, color: ColorManager.secondary),
               )
             ],
           )
@@ -220,8 +229,7 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
       return;
     }
 
-    setState(() {
-    });
+    setState(() {});
 
     bool dialogShown = false;
 
@@ -326,8 +334,7 @@ class _CoverLetterTemplatesViewState extends State<CoverLetterTemplatesView> {
       }
     } finally {
       if (mounted) {
-        setState(() {
-        });
+        setState(() {});
       }
     }
   }

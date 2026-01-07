@@ -11,6 +11,10 @@ import 'package:resume_builder/model/comprehensive_resume_model.dart';
 import 'package:resume_builder/my_singleton.dart';
 import 'package:resume_builder/screens/comprehensive_resume_data_screen.dart';
 import 'package:resume_builder/screens/AtsCheckingScreen.dart';
+import 'package:resume_builder/google_ads/admob_service.dart';
+import 'package:resume_builder/google_ads/adunits.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:resume_builder/Presentation/resources/strings_manager.dart';
 
 class EnhancedDownloadScreen extends StatefulWidget {
   final String templateId;
@@ -31,7 +35,7 @@ class EnhancedDownloadScreen extends StatefulWidget {
 class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
   File? _generatedPdfFile;
   bool _isGeneratingAIPdf = false;
-   bool _isGeneratingPdf = false;
+  bool _isGeneratingPdf = false;
   ATSResult? _atsResult;
   String? _errorMessage;
   ComprehensiveResumeData? _comprehensiveData;
@@ -55,19 +59,21 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
     try {
       final userId = MySingleton.userId;
       final resumeId = MySingleton.resumeId;
-      
+
       if (userId == null || resumeId == null) {
         throw Exception('User ID or Resume ID not found');
       }
 
       print('Loading comprehensive resume data...');
-      final comprehensiveData = await ComprehensiveResumeService.instance.collectAllResumeData(
+      final comprehensiveData =
+          await ComprehensiveResumeService.instance.collectAllResumeData(
         userId: userId,
         resumeId: resumeId,
       );
 
       // Validate the data
-      final validationResults = ComprehensiveResumeService.instance.validateResumeData(comprehensiveData);
+      final validationResults = ComprehensiveResumeService.instance
+          .validateResumeData(comprehensiveData);
 
       if (!mounted) return;
       setState(() {
@@ -110,12 +116,12 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
     });
 
     try {
+      final pdfData = ComprehensiveResumeService.instance
+          .convertToPDFFormat(_comprehensiveData!);
 
-      final pdfData = ComprehensiveResumeService.instance.convertToPDFFormat(_comprehensiveData!);
-      
       print('Generating PDF with comprehensive data...');
       print('Data sections: ${pdfData.keys.toList()}');
-  
+
       final pdfFile = await PDFGenerationService.instance.generateResumePDF(
         templateId: widget.templateId,
         resumeData: pdfData,
@@ -278,8 +284,6 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
     );
   }
 
- 
-
   Future<void> _downloadPDF() async {
     if (_generatedPdfFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -295,10 +299,10 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
       print('Download PDF clicked - Saving PDF...');
 
       // Get Downloads directory
-      final directory = await getExternalStorageDirectory() ?? 
-                       await getApplicationDocumentsDirectory();
+      final directory = await getExternalStorageDirectory() ??
+          await getApplicationDocumentsDirectory();
       final downloadsDir = Directory('${directory.path}/Downloads');
-      
+
       if (!await downloadsDir.exists()) {
         await downloadsDir.create(recursive: true);
       }
@@ -343,18 +347,20 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
 
     try {
       print('ATS Check clicked - Triggering Hugging Face API analysis...');
-      
+
       // Convert resume data to text for analysis (includes Overview section - summary)
       final resumeContent = _buildResumeContentText();
       print('Resume content length: ${resumeContent.length} characters');
-      print('Overview section (summary): ${_comprehensiveData?.summary?.length ?? 0} characters');
-      
+      print(
+          'Overview section (summary): ${_comprehensiveData?.summary?.length ?? 0} characters');
+
       // Perform ATS analysis with Hugging Face API integration
       final atsResult = await ATSCheckingService.instance.analyzeResume(
         resumeContent: resumeContent,
         jobDescription: widget.resumeData['jobDescription'],
         pdfFile: _generatedPdfFile!,
-        comprehensiveData: _comprehensiveData, // Pass comprehensive data for enhanced analysis
+        comprehensiveData:
+            _comprehensiveData, // Pass comprehensive data for enhanced analysis
       );
 
       if (!mounted) return;
@@ -364,10 +370,10 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
 
       // Show success message with Hugging Face status
       final hfStatus = atsResult.details['hugging_face_status'] ?? 'unknown';
-      final statusMessage = hfStatus == 'success' 
+      final statusMessage = hfStatus == 'success'
           ? 'ATS analysis completed with Hugging Face API! Score: ${atsResult.score.toStringAsFixed(1)}%'
           : 'ATS analysis completed! Score: ${atsResult.score.toStringAsFixed(1)}%';
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(statusMessage),
@@ -380,9 +386,9 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
       setState(() {
         _errorMessage = 'ATS check failed: $e';
       });
-      
+
       print('ATS check error: $e');
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -400,7 +406,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
     }
 
     final buffer = StringBuffer();
-    
+
     // Add personal information
     buffer.writeln(_comprehensiveData!.fullName);
     if (_comprehensiveData!.position?.isNotEmpty == true) {
@@ -412,29 +418,31 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
     if (_comprehensiveData!.phone?.isNotEmpty == true) {
       buffer.writeln(_comprehensiveData!.phone!);
     }
-    
+
     buffer.writeln();
-    
+
     // Add Overview section (Professional Summary) - This is the primary content for analysis
     if (_comprehensiveData!.summary?.isNotEmpty == true) {
       buffer.writeln('PROFESSIONAL SUMMARY');
       buffer.writeln(_comprehensiveData!.summary!);
       buffer.writeln();
     }
-    
+
     // Add work experience
     if (_comprehensiveData!.workExperience.isNotEmpty) {
       buffer.writeln('WORK EXPERIENCE');
       for (final work in _comprehensiveData!.workExperience) {
         if (work.position?.isNotEmpty == true) buffer.writeln(work.position!);
-        if (work.companyName?.isNotEmpty == true) buffer.writeln(work.companyName!);
+        if (work.companyName?.isNotEmpty == true)
+          buffer.writeln(work.companyName!);
         if (work.startDate?.isNotEmpty == true) {
-          final duration = work.isCurrent 
+          final duration = work.isCurrent
               ? '${work.startDate} - Present'
               : '${work.startDate} - ${work.endDate ?? ''}';
           buffer.writeln(duration);
         }
-        if (work.description?.isNotEmpty == true) buffer.writeln(work.description!);
+        if (work.description?.isNotEmpty == true)
+          buffer.writeln(work.description!);
         if (work.achievements.isNotEmpty) {
           for (final achievement in work.achievements) {
             buffer.writeln('• $achievement');
@@ -443,33 +451,36 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
         buffer.writeln();
       }
     }
-    
+
     // Add education
     if (_comprehensiveData!.education.isNotEmpty) {
       buffer.writeln('EDUCATION');
       for (final edu in _comprehensiveData!.education) {
         if (edu.degree?.isNotEmpty == true) buffer.writeln(edu.degree!);
-        if (edu.institution?.isNotEmpty == true) buffer.writeln(edu.institution!);
-        if (edu.fieldOfStudy?.isNotEmpty == true) buffer.writeln(edu.fieldOfStudy!);
+        if (edu.institution?.isNotEmpty == true)
+          buffer.writeln(edu.institution!);
+        if (edu.fieldOfStudy?.isNotEmpty == true)
+          buffer.writeln(edu.fieldOfStudy!);
         if (edu.startDate?.isNotEmpty == true) {
-          final duration = edu.isCurrent 
+          final duration = edu.isCurrent
               ? '${edu.startDate} - Present'
               : '${edu.startDate} - ${edu.endDate ?? ''}';
           buffer.writeln(duration);
         }
         if (edu.gpa != null) buffer.writeln('GPA: ${edu.gpa}');
-        if (edu.description?.isNotEmpty == true) buffer.writeln(edu.description!);
+        if (edu.description?.isNotEmpty == true)
+          buffer.writeln(edu.description!);
         buffer.writeln();
       }
     }
-    
+
     // Add skills
     if (_comprehensiveData!.skills.isNotEmpty) {
       buffer.writeln('SKILLS');
       buffer.writeln(_comprehensiveData!.skills.join(', '));
       buffer.writeln();
     }
-    
+
     // Add additional sections
     if (_comprehensiveData!.additionalSections.isNotEmpty) {
       for (final section in _comprehensiveData!.additionalSections) {
@@ -477,14 +488,15 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
           buffer.writeln(section.title.toUpperCase());
           for (final item in section.items) {
             if (item.title.isNotEmpty) buffer.writeln(item.title);
-            if (item.description?.isNotEmpty == true) buffer.writeln(item.description!);
+            if (item.description?.isNotEmpty == true)
+              buffer.writeln(item.description!);
             if (item.date?.isNotEmpty == true) buffer.writeln(item.date!);
             buffer.writeln();
           }
         }
       }
     }
-    
+
     return buffer.toString();
   }
 
@@ -520,7 +532,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Template: ${widget.templateId}',
+                      'Template: ${AppStrings.templateNames[widget.templateId] ?? widget.templateId}',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -540,9 +552,9 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Data Overview Section
             if (_isLoadingData) ...[
               Card(
@@ -586,9 +598,9 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ),
               ),
             ],
-            
+
             const SizedBox(height: 20),
-            
+
             // PDF Generation Section
             Card(
               elevation: 2,
@@ -606,7 +618,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // AI Enhancement Toggle
                     if (AIServiceManager.instance.isAvailable)
                       Row(
@@ -623,23 +635,28 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                           ),
                         ],
                       ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Generate PDF Buttons
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: _isGeneratingAIPdf ? null : () => _generatePDF(useAIEnhancement: true),
+                            onPressed: _isGeneratingAIPdf
+                                ? null
+                                : () => _generatePDF(useAIEnhancement: true),
                             icon: _isGeneratingAIPdf
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
                                   )
                                 : const Icon(Icons.auto_awesome),
-                            label: Text(_isGeneratingAIPdf ? 'Generating...' : 'Generate with AI'),
+                            label: Text(_isGeneratingAIPdf
+                                ? 'Generating...'
+                                : 'Generate with AI'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[600],
                               foregroundColor: Colors.white,
@@ -650,15 +667,20 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: _isGeneratingPdf ? null : () => _generatePDF(useAIEnhancement: false),
+                            onPressed: _isGeneratingPdf
+                                ? null
+                                : () => _generatePDF(useAIEnhancement: false),
                             icon: _isGeneratingPdf
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
                                   )
                                 : const Icon(Icons.description),
-                            label: Text(_isGeneratingPdf ? 'Generating...' : 'Generate Standard'),
+                            label: Text(_isGeneratingPdf
+                                ? 'Generating...'
+                                : 'Generate Standard'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey[600],
                               foregroundColor: Colors.white,
@@ -672,9 +694,9 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Download Section
             if (_generatedPdfFile != null) ...[
               Card(
@@ -693,11 +715,10 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // PDF Preview and Actions
                       Row(
                         children: [
-                          
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: _downloadPDF,
@@ -706,7 +727,8 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green[600],
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                               ),
                             ),
                           ),
@@ -716,9 +738,9 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // ATS Checking Section
               Card(
                 elevation: 2,
@@ -736,7 +758,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // ATS Check Button
                       SizedBox(
                         width: double.infinity,
@@ -751,11 +773,61 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                               );
                               return;
                             }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AtsCheckingScreen(initialResumeFile: _generatedPdfFile),
+
+                            // Show loading indicator
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Loading Ad...'),
+                                duration: Duration(seconds: 1),
                               ),
+                            );
+
+                            // Load Interstitial Ad
+                            AdMobService.loadInterstitialAd(
+                              adUnitId: AdUnitId.resumeBuilderInterstitialAd,
+                              onAdLoaded: (InterstitialAd ad) {
+                                // Ad loaded successfully
+                                ad.fullScreenContentCallback =
+                                    FullScreenContentCallback(
+                                  onAdDismissedFullScreenContent: (ad) {
+                                    ad.dispose();
+                                    // Navigate after ad is closed
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AtsCheckingScreen(
+                                            initialResumeFile:
+                                                _generatedPdfFile),
+                                      ),
+                                    );
+                                  },
+                                  onAdFailedToShowFullScreenContent:
+                                      (ad, error) {
+                                    ad.dispose();
+                                    // Fallback navigation
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AtsCheckingScreen(
+                                            initialResumeFile:
+                                                _generatedPdfFile),
+                                      ),
+                                    );
+                                  },
+                                );
+                                ad.show();
+                              },
+                              onAdFailedToLoad: (LoadAdError error) {
+                                print('Interstitial ad failed to load: $error');
+                                // Fallback navigation if ad fails to load
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AtsCheckingScreen(
+                                        initialResumeFile: _generatedPdfFile),
+                                  ),
+                                );
+                              },
                             );
                           },
                           icon: const Icon(Icons.analytics),
@@ -772,7 +844,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ),
               ),
             ],
-            
+
             // ATS Results
             if (_atsResult != null) ...[
               const SizedBox(height: 20),
@@ -798,21 +870,25 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                             ),
                           ),
                           // Hugging Face API Status Badge
-                          if (_atsResult!.details.containsKey('hugging_face_status'))
+                          if (_atsResult!.details
+                              .containsKey('hugging_face_status'))
                             _buildHuggingFaceStatusBadge(
-                              _atsResult!.details['hugging_face_status'] as String,
+                              _atsResult!.details['hugging_face_status']
+                                  as String,
                             ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // ATS Score
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: _getScoreColor(_atsResult!.score).withOpacity(0.1),
+                          color: _getScoreColor(_atsResult!.score)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: _getScoreColor(_atsResult!.score)),
+                          border: Border.all(
+                              color: _getScoreColor(_atsResult!.score)),
                         ),
                         child: Row(
                           children: [
@@ -844,11 +920,14 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                                     ),
                                   ),
                                   // Show Hugging Face analysis source if available
-                                  if (_atsResult!.details['hugging_face_status'] == 'success') ...[
+                                  if (_atsResult!
+                                          .details['hugging_face_status'] ==
+                                      'success') ...[
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        Icon(Icons.api, size: 14, color: Colors.blue[600]),
+                                        Icon(Icons.api,
+                                            size: 14, color: Colors.blue[600]),
                                         const SizedBox(width: 4),
                                         Text(
                                           'Analyzed with Hugging Face API',
@@ -874,17 +953,19 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                           ],
                         ),
                       ),
-                      
+
                       // Hugging Face Analysis Details
-                      if (_atsResult!.details.containsKey('hugging_face_analysis')) ...[
+                      if (_atsResult!.details
+                          .containsKey('hugging_face_analysis')) ...[
                         const SizedBox(height: 16),
                         _buildHuggingFaceAnalysisCard(
-                          _atsResult!.details['hugging_face_analysis'] as Map<String, dynamic>,
+                          _atsResult!.details['hugging_face_analysis']
+                              as Map<String, dynamic>,
                         ),
                       ],
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Suggestions
                       if (_atsResult!.suggestions.isNotEmpty) ...[
                         Text(
@@ -896,36 +977,39 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        ..._atsResult!.suggestions.map((suggestion) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.lightbulb_outline,
-                                size: 16,
-                                color: Colors.amber[600],
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  suggestion,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
+                        ..._atsResult!.suggestions
+                            .map((suggestion) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.lightbulb_outline,
+                                        size: 16,
+                                        color: Colors.amber[600],
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          suggestion,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )).toList(),
+                                ))
+                            .toList(),
                       ],
                     ],
                   ),
                 ),
               ),
             ],
-            
+
             // Error Message
             if (_errorMessage != null) ...[
               const SizedBox(height: 20),
@@ -1053,7 +1137,8 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
             _buildAnalysisRow('Match', hfAnalysis['match'].toString()),
           // Show full response if no specific fields
           if (hfAnalysis.containsKey('full_response'))
-            _buildAnalysisRow('Full Response', hfAnalysis['full_response'].toString()),
+            _buildAnalysisRow(
+                'Full Response', hfAnalysis['full_response'].toString()),
         ],
       ),
     );
@@ -1121,7 +1206,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Completeness Score
             Container(
               padding: const EdgeInsets.all(16),
@@ -1165,14 +1250,14 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Data Summary
             _buildDataSummary(data),
-            
+
             const SizedBox(height: 16),
-            
+
             // Issues and Warnings
             if (issues.isNotEmpty || warnings.isNotEmpty) ...[
               if (issues.isNotEmpty) ...[
@@ -1186,27 +1271,26 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ),
                 const SizedBox(height: 8),
                 ...issues.map((issue) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.error, size: 16, color: Colors.red[600]),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          issue,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.red[700],
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.error, size: 16, color: Colors.red[600]),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              issue,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.red[700],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                )),
+                    )),
                 const SizedBox(height: 12),
               ],
-              
               if (warnings.isNotEmpty) ...[
                 Text(
                   'Recommendations:',
@@ -1218,24 +1302,25 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                 ),
                 const SizedBox(height: 8),
                 ...warnings.map((warning) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.warning, size: 16, color: Colors.orange[600]),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          warning,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange[700],
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.warning,
+                              size: 16, color: Colors.orange[600]),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              warning,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.orange[700],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                )),
+                    )),
               ],
             ],
           ],
@@ -1260,11 +1345,13 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
         const SizedBox(height: 8),
         _buildSummaryItem('Personal Info', data.fullName.isNotEmpty),
         _buildSummaryItem('Contact Info', data.contactInfo.isNotEmpty),
-        _buildSummaryItem('Professional Summary', data.summary?.isNotEmpty == true),
+        _buildSummaryItem(
+            'Professional Summary', data.summary?.isNotEmpty == true),
         _buildSummaryItem('Work Experience', data.workExperience.isNotEmpty),
         _buildSummaryItem('Education', data.education.isNotEmpty),
         _buildSummaryItem('Skills', data.skills.isNotEmpty),
-        _buildSummaryItem('Additional Sections', data.additionalSections.isNotEmpty),
+        _buildSummaryItem(
+            'Additional Sections', data.additionalSections.isNotEmpty),
         _buildSummaryItem('Cover Letter', data.coverLetter?.isNotEmpty == true),
         _buildSummaryItem('Signature', data.signaturePath?.isNotEmpty == true),
       ],

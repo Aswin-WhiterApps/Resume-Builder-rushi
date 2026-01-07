@@ -36,12 +36,10 @@ class Template3 {
     nameFont = Font.timesBold();
     normalFont = Font.times();
     headerFont = Font.timesBold();
-    nameColor = resume3themeModel?.nameColor ??
-        PdfColor.fromHex('#0288D1'); // Light Blue
-    headerColor = resume3themeModel?.headerDarkColor ??
-        PdfColor.fromHex('#0288D1'); // Light Blue
-    normalColor =
-        resume3themeModel?.normalTextColor ?? PdfColor.fromHex('#1A237E');
+    nameColor = resume3themeModel?.nameColor ?? PdfColor.fromHex('#00070A');
+    headerColor =
+        resume3themeModel?.headerDarkColor ?? PdfColor.fromHex('#00070A');
+    normalColor = PdfColor.fromHex('#0288D1');
     bulletPathFromTheme = resume3themeModel?.bullet;
   }
 
@@ -154,7 +152,7 @@ class Template3 {
       }
     }
 
-    if (signatureImage != null) {
+  if (signatureImage != null) {
       rightColumnWidgets.add(
         Container(
           alignment: Alignment.centerRight,
@@ -183,112 +181,112 @@ class Template3 {
     }
 
     pdf.addPage(
-      Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: const EdgeInsets.all(15),
+      MultiPage(
+        pageTheme: PageTheme(
+          pageFormat: PdfPageFormat.a4,
+          margin: const EdgeInsets.all(15),
+        ),
         build: (Context context) {
-          return Column(
-            children: [
-              if (profileImage != null)
-                Center(
-                  child: ClipOval(
-                    child: SizedBox.fromSize(
-                      size: const PdfPoint(60, 60),
-                      child: Image(profileImage!, fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-              SizedBox(height: 10),
+          return [
+            if (profileImage != null)
               Center(
-                child: Text(
-                  "${introData?.firstName ?? ""} ${introData?.lastName ?? ""}"
-                      .toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    font: nameFont,
-                    color: nameColor,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.2,
+                child: ClipOval(
+                  child: SizedBox.fromSize(
+                    size: const PdfPoint(60, 60),
+                    child: Image(profileImage!, fit: BoxFit.cover),
                   ),
                 ),
               ),
-              SizedBox(height: 10),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 4,
-                children: [
-                  if (contactData?.email?.isNotEmpty ?? false)
-                    Text(
-                      contactData!.email!,
-                      style: TextStyle(fontSize: 7, color: normalColor),
-                    ),
-                  if (contactData?.phone?.isNotEmpty ?? false)
-                    Text(
-                      contactData!.phone!,
-                      style: TextStyle(fontSize: 7, color: normalColor),
-                    ),
-                  if (contactData?.addr1?.isNotEmpty ?? false)
-                    Text(
-                      contactData!.addr1!,
-                      style: TextStyle(fontSize: 7, color: normalColor),
-                    ),
-                  if (contactData?.addr2?.isNotEmpty ?? false)
-                    Text(
-                      contactData!.addr2!,
-                      style: TextStyle(fontSize: 7, color: normalColor),
-                    ),
-                  if (contactData?.socialMediaUrl1?.isNotEmpty ?? false)
-                    Text(
-                      contactData!.socialMediaUrl1!,
-                      style: TextStyle(
-                        fontSize: 7,
-                        color: PdfColor.fromHex('#B87397'),
-                      ),
-                    ),
-                  if (contactData?.socialMediaUrl2?.isNotEmpty ?? false)
-                    Text(
-                      contactData!.socialMediaUrl2!,
-                      style: TextStyle(
-                        fontSize: 7,
-                        color: PdfColor.fromHex('#B87397'),
-                      ),
-                    ),
-                ],
+            SizedBox(height: 10),
+            Center(
+              child: Text(
+                "${introData?.firstName ?? ""} ${introData?.lastName ?? ""}"
+                    .toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  font: nameFont,
+                  color: nameColor,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.2,
+                ),
               ),
-              SizedBox(height: 20),
-              // Main content with two columns
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: leftColumnWidgets,
+            ),
+            SizedBox(height: 10),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                if (contactData?.email?.isNotEmpty ?? false)
+                  Text(
+                    contactData!.email!,
+                    style: TextStyle(fontSize: 7, color: normalColor),
+                  ),
+                if (contactData?.phone?.isNotEmpty ?? false)
+                  Text(
+                    contactData!.phone!,
+                    style: TextStyle(fontSize: 7, color: normalColor),
+                  ),
+                if (contactData?.addr1?.isNotEmpty ?? false)
+                  Text(
+                    contactData!.addr1!,
+                    style: TextStyle(fontSize: 7, color: normalColor),
+                  ),
+                if (contactData?.addr2?.isNotEmpty ?? false)
+                  Text(
+                    contactData!.addr2!,
+                    style: TextStyle(fontSize: 7, color: normalColor),
+                  ),
+                if (contactData?.socialMediaUrl1?.isNotEmpty ?? false)
+                  Text(
+                    contactData!.socialMediaUrl1!,
+                    style: TextStyle(
+                      fontSize: 7,
+                      color: PdfColors.blue,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Container(
-                    width: 1,
-                    height: PdfPageFormat.a4.height - 180,
-                    color: PdfColors.black,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: rightColumnWidgets,
+                if (contactData?.socialMediaUrl2?.isNotEmpty ?? false)
+                  Text(
+                    contactData!.socialMediaUrl2!,
+                    style: TextStyle(
+                      fontSize: 7,
+                      color: PdfColors.blue,
                     ),
                   ),
-                ],
-              ),
-            ],
-          );
+              ],
+            ),
+            SizedBox(height: 20),
+            Partitions(
+              children: [
+                Partition(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: leftColumnWidgets,
+                  ),
+                ),
+                Partition(
+                  width: 20,
+                  child: Container(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      width: 1,
+                      color: PdfColors.black,
+                      height: double.infinity,
+                    ),
+                  ),
+                ),
+                Partition(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: rightColumnWidgets,
+                  ),
+                ),
+              ],
+            ),
+          ];
         },
       ),
     );
@@ -296,13 +294,13 @@ class Template3 {
     try {
       final outputDir = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-      final filePath = "${outputDir.path}/Resume_T3_$timestamp.pdf";
+      final filePath = "${outputDir.path}/Resume_T1_$timestamp.pdf";
       final file = File(filePath);
       await file.writeAsBytes(await pdf.save());
       print("PDF Saved To: $filePath");
       return file;
     } catch (e) {
-      print('Failed to save PDF for Template3: $e');
+      print('Failed to save PDF for Template1: $e');
       return null;
     }
   }
@@ -333,9 +331,57 @@ class Template3 {
       _getHeaderText1(text: AppStrings.t4),
       SizedBox(height: 4),
       for (final work in workData)
-        _buildBulletedText(
-          text:
-              "${work.compName ?? ""} - ${work.compPosition ?? ""}\nDuration: ${(work.present ?? false) ? '[${work.dateFrom ?? ""}] - Present' : '[${work.dateFrom ?? ""} - ${work.dateTo ?? ""}]'}",
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (((work.compPosition ?? '').trim()).isNotEmpty)
+                Text(
+                  (work.compPosition ?? '').trim(),
+                  style: TextStyle(
+                    color: normalColor,
+                    fontSize: 10,
+                    font: headerFont,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              if (((work.compName ?? '').trim()).isNotEmpty ||
+                  ((work.compLocation ?? '').trim()).isNotEmpty)
+                Text(
+                  [
+                    (work.compName ?? '').trim(),
+                    (work.compLocation ?? '').trim(),
+                  ].where((s) => s.isNotEmpty).join(' | '),
+                  style: TextStyle(
+                    color: normalColor,
+                    fontSize: 9,
+                    font: normalFont,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              Text(
+                (work.present ?? false)
+                    ? "${(work.dateFrom ?? '').trim()} - Present"
+                    : "${(work.dateFrom ?? '').trim()} - ${(work.dateTo ?? '').trim()}",
+                style: TextStyle(
+                  color: normalColor,
+                  fontSize: 8,
+                  font: normalFont,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (((work.details ?? '').trim()).isNotEmpty) ...[
+                SizedBox(height: 4),
+                for (final d in (work.details ?? '')
+                    .split(RegExp(r'[\n@]+'))
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty))
+                  _buildBulletedText(text: d),
+              ]
+            ],
+          ),
         ),
       SizedBox(height: 8),
     ]);
@@ -347,6 +393,9 @@ class Template3 {
       required String descriptionText}) {
     final List<String> itemTitles =
         itemText.split('@').where((s) => s.trim().isNotEmpty).toList();
+    final List<String> itemDescriptions =
+        descriptionText.split(RegExp(r'@{1,3}'));
+
     if (itemTitles.isEmpty && descriptionText.trim().isEmpty)
       return SizedBox.shrink();
 
@@ -356,12 +405,23 @@ class Template3 {
         _getHeaderText1(text: title),
         SizedBox(height: 4),
         for (int i = 0; i < itemTitles.length; i++)
-          _buildBulletedText(text: itemTitles[i]),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBulletedText(text: itemTitles[i], isBold: true),
+              if (i < itemDescriptions.length &&
+                  itemDescriptions[i].trim().isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, bottom: 4),
+                  child: _getNormalText1(text: itemDescriptions[i].trim()),
+                ),
+            ],
+          )
       ]),
     );
   }
 
-  Widget _buildBulletedText({required String text}) {
+  Widget _buildBulletedText({required String text, bool isBold = false}) {
     return Padding(
       padding: const EdgeInsets.only(left: 10, bottom: 3),
       child: Row(
@@ -374,20 +434,20 @@ class Template3 {
           else
             Text("• ", style: TextStyle(fontSize: 8)),
           SizedBox(width: 10),
-          Expanded(child: _getNormalText1(text: text)),
+          Expanded(child: _getNormalText1(text: text, isBold: isBold)),
         ],
       ),
     );
   }
 
-  Widget _getNormalText1({required String text}) {
+  Widget _getNormalText1({required String text, bool isBold = false}) {
     return Text(text,
         style: TextStyle(
           color: normalColor,
-          fontSize: 10,
-          font: normalFont,
-          letterSpacing: 0.1,
-          lineSpacing: 1.5,
+          fontSize: 9,
+          font: isBold ? headerFont : normalFont,
+          fontWeight: isBold ? FontWeight.bold : null,
+          letterSpacing: -0.2,
         ));
   }
 

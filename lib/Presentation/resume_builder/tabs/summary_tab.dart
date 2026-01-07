@@ -26,7 +26,6 @@ class SummaryTabView extends StatefulWidget {
 class SummaryTabViewState extends State<SummaryTabView> {
   final TextEditingController _summaryController = TextEditingController();
   Timer? _debounce;
-  bool _isRefreshingAI = false;
 
   @override
   void initState() {
@@ -47,7 +46,9 @@ class SummaryTabViewState extends State<SummaryTabView> {
     final userId = MySingleton.userId;
     final resumeId = MySingleton.resumeId;
     if (userId != null && resumeId != null) {
-      context.read<SummaryBloc>().add(LoadSummary(userId: userId, resumeId: resumeId));
+      context
+          .read<SummaryBloc>()
+          .add(LoadSummary(userId: userId, resumeId: resumeId));
     }
   }
 
@@ -58,10 +59,10 @@ class SummaryTabViewState extends State<SummaryTabView> {
       final resumeId = MySingleton.resumeId;
       if (userId != null && resumeId != null) {
         context.read<SummaryBloc>().add(UpdateSummary(
-          userId: userId,
-          resumeId: resumeId,
-          summary: _summaryController.text,
-        ));
+              userId: userId,
+              resumeId: resumeId,
+              summary: _summaryController.text,
+            ));
       }
     });
   }
@@ -74,10 +75,10 @@ class SummaryTabViewState extends State<SummaryTabView> {
     final resumeId = MySingleton.resumeId;
     if (userId != null && resumeId != null) {
       context.read<SummaryBloc>().add(UpdateSummary(
-        userId: userId,
-        resumeId: resumeId,
-        summary: _summaryController.text,
-      ));
+            userId: userId,
+            resumeId: resumeId,
+            summary: _summaryController.text,
+          ));
     }
   }
 
@@ -147,12 +148,14 @@ class SummaryTabViewState extends State<SummaryTabView> {
 
   Widget _buildHeaderRow() {
     return Padding(
-      padding: const EdgeInsets.only(left: AppPadding.p8, bottom: AppPadding.p20, top: AppPadding.p8),
+      padding: const EdgeInsets.only(
+          left: AppPadding.p8, bottom: AppPadding.p20, top: AppPadding.p8),
       child: Row(
         children: [
           const Text(
             AppStrings.yourSummeryStat,
-            style: TextStyle(fontSize: FontSize.s20, fontWeight: FontWeight.bold),
+            style:
+                TextStyle(fontSize: FontSize.s20, fontWeight: FontWeight.bold),
           ),
           const Spacer(),
         ],
@@ -162,9 +165,7 @@ class SummaryTabViewState extends State<SummaryTabView> {
 
   Future<void> _refreshSummaryWithAI() async {
     try {
-      setState(() {
-        _isRefreshingAI = true;
-      });
+      setState(() {});
 
       final userId = MySingleton.userId;
       final resumeId = MySingleton.resumeId;
@@ -173,7 +174,8 @@ class SummaryTabViewState extends State<SummaryTabView> {
       }
 
       // Collect comprehensive resume details
-      final data = await ComprehensiveResumeService.instance.collectAllResumeData(
+      final data =
+          await ComprehensiveResumeService.instance.collectAllResumeData(
         userId: userId,
         resumeId: resumeId,
       );
@@ -182,7 +184,9 @@ class SummaryTabViewState extends State<SummaryTabView> {
       final position = data.position ?? 'Professional';
       final skills = data.skills;
       final experiences = data.workExperience
-          .map((e) => (e.position ?? '') + (e.description != null ? ': ' + e.description! : ''))
+          .map((e) =>
+              (e.position ?? '') +
+              (e.description != null ? ': ' + e.description! : ''))
           .where((s) => s.trim().isNotEmpty)
           .toList();
 
@@ -197,17 +201,19 @@ class SummaryTabViewState extends State<SummaryTabView> {
       saveSummary();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('AI summary generated'), backgroundColor: Colors.green),
+        const SnackBar(
+            content: Text('AI summary generated'),
+            backgroundColor: Colors.green),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to refresh with AI: $e'), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text('Failed to refresh with AI: $e'),
+            backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {
-        setState(() {
-          _isRefreshingAI = false;
-        });
+        setState(() {});
       }
     }
   }
@@ -226,7 +232,8 @@ class SummaryTabViewState extends State<SummaryTabView> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSize.s8, AppPadding.p12, AppSize.s8, AppPadding.p12),
+        padding: const EdgeInsets.fromLTRB(
+            AppSize.s8, AppPadding.p12, AppSize.s8, AppPadding.p12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -254,7 +261,10 @@ class SummaryTabViewState extends State<SummaryTabView> {
       padding: EdgeInsets.all(AppPadding.p8),
       child: Text(
         AppStrings.exapmles,
-        style: TextStyle(color: Colors.black, fontSize: FontSize.s12, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: Colors.black,
+            fontSize: FontSize.s12,
+            fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -280,7 +290,9 @@ class SummaryTabViewState extends State<SummaryTabView> {
     );
   }
 
-  Widget _getMultiLineTextField({required TextEditingController textEditingController, required String hint}) {
+  Widget _getMultiLineTextField(
+      {required TextEditingController textEditingController,
+      required String hint}) {
     return TextField(
       maxLength: 500,
       maxLines: 5,
@@ -348,13 +360,13 @@ class SummaryTabViewState extends State<SummaryTabView> {
               ),
               Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      text,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 9,
-                    ),
-                  ))
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  text,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 9,
+                ),
+              ))
             ],
           ),
         ),

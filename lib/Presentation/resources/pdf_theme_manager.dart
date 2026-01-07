@@ -94,8 +94,7 @@ class Resume2Theme1 {
   late Resume2ThemeModel resume2theme1;
   Future<void> getModel() async {
     resume2theme1 = await getFonts().then((value) => Resume2ThemeModel(
-        imageBorder: PdfColor.fromHex("#F8EDED"),
-        // verticalObjColor:PdfColor.fromHex("#B27B80"),
+        imageBorder: PdfColors.white,
         backgroundColor: PdfColor.fromHex("#F8EDED"),
         nameColor: PdfColor.fromHex("#F8EDED"),
         headerLight: PdfColor.fromHex("#F8EDED"),
@@ -125,7 +124,7 @@ class Resume2Theme2 {
   late Resume2ThemeModel resume2theme2;
   Future<void> getModel() async {
     resume2theme2 = await getFonts().then((value) => Resume2ThemeModel(
-        imageBorder: PdfColor.fromHex("#F8F8F8"),
+        imageBorder: PdfColors.white,
         // verticalObjColor:PdfColor.fromHex("#8C7C65"),
         backgroundColor: PdfColor.fromHex("#F0E2CD"),
         nameColor: PdfColor.fromHex("#E9E9E9"),
@@ -189,10 +188,10 @@ class Resume3Theme1 {
     resume3theme1 = await getFonts().then((value) => Resume3ThemeModel(
         imageBorder: PdfColor.fromHex("#4FC3F7"), // Light Blue
         normalTextColor: PdfColor.fromHex("#455A64"), // Blue Grey
-        headerDarkColor: PdfColor.fromHex("#0288D1"), // Darker Light Blue
+        headerDarkColor: PdfColor.fromHex('#014468'), // Darker Light Blue
         headerLightColor: PdfColor.fromHex("#81D4FA"), // Light Blue
         background: PdfColor.fromHex("#77AEB5"), // Very Light Blue Background
-        nameColor: PdfColor.fromHex("#0288D1"), // Darker Light Blue
+        nameColor: PdfColor.fromHex("#014468"), // Darker Light Blue
         bullet: PdfAssets.bullet31,
         objHorizontal: PdfAssets.objH31,
         objVertical: PdfAssets.objV31,
@@ -366,9 +365,9 @@ class Resume5Theme1 {
         headerDarkColor: PdfColor.fromHex("#B87397"),
         nameColor: PdfColor.fromHex("#B87397"),
         background: PdfAssets.back22,
-        email: PdfAssets.email51,
-        phone: PdfAssets.phone51,
-        link: PdfAssets.link51,
+        email: PdfAssets.email3,
+        phone: PdfAssets.phone3,
+        link: PdfAssets.link3,
         bullet: PdfAssets.bullet51,
         bulletDark: PdfAssets.bullet22dark,
         bulletLight: PdfAssets.bullet22light,
@@ -613,7 +612,9 @@ class Resume7Theme1 {
           dateColor: PdfColor.fromHex("#E0DFDC"),
           linkColor: PdfColor.fromHex("#E0DFDC"),
           background: PdfAssets.t31Horizontal,
-          link: PdfAssets.link7,
+          emailIc: PdfAssets.email64,
+          phoneIc: PdfAssets.phone64,
+          linkIc: PdfAssets.link7,
           bullet: PdfAssets.bullet7,
           headerFont: headerFont,
           normalFont: normalFont,
@@ -637,16 +638,15 @@ class Resume7Theme2 {
   Future<void> getModel() async {
     resume7theme2 = await getFonts().then((value) => Resume7ThemeModel(
           // imageBorderColor:PdfColor.fromHex("#54616A"),
-          normalTextColor: PdfColor.fromHex("#FCFBF7"),
-          headerLightColor: PdfColor.fromHex("#FCFBF7"),
-          headerDarkColor: PdfColor.fromHex("#9ADBFF"),
-          nameColor: PdfColor.fromHex("#FCFBF7"),
-          positionColor: PdfColor.fromHex("#9ADBFF"),
-          boxColor: PdfColor.fromHex("#478FB6"),
-          dateColor: PdfColor.fromHex("#E0DFDC"),
-          linkColor: PdfColor.fromHex("#E0DFDC"),
-
-          background: PdfAssets.t31Horizontal,
+          normalTextColor: PdfColor.fromHex("#FFFFFF"),
+          headerLightColor: PdfColor.fromHex("#FFFFFF"),
+          headerDarkColor: PdfColor.fromHex("#FFFFFF"),
+          nameColor: PdfColor.fromHex("#FFFFFF"),
+          positionColor: PdfColor.fromHex("#87CEEB"),
+          boxColor: PdfColor.fromHex("#ECF0F1"),
+          dateColor: PdfColor.fromHex("#7F8C8D"),
+          linkColor: PdfColor.fromHex("#3498DB"),
+          background: PdfAssets.t32Horizontal,
           link: PdfAssets.link7,
           bullet: PdfAssets.bullet7,
 
@@ -657,9 +657,9 @@ class Resume7Theme2 {
   }
 
   Future<void> getFonts() async {
-    headerFont = await PdfGoogleFonts.dMSansRegular();
-    nameFont = await PdfGoogleFonts.dMSansRegular();
-    normalFont = await PdfGoogleFonts.dMSansRegular();
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    nameFont = await PdfGoogleFonts.interBold();
+    normalFont = await PdfGoogleFonts.interRegular();
   }
 }
 
@@ -681,7 +681,7 @@ class Resume7Theme3 {
           dateColor: PdfColor.fromHex("#E0DFDC"),
           linkColor: PdfColor.fromHex("#E0DFDC"),
 
-          background: PdfAssets.t31Horizontal,
+          background: PdfAssets.t33Horizontal,
           link: PdfAssets.link7,
           bullet: PdfAssets.bullet7,
 
@@ -709,7 +709,6 @@ class Resume8Theme1 {
     resume8theme1 = Resume8ThemeModel(
       imageBorderColor: PdfColor.fromHex("#54616A"),
       normalTextColor: PdfColor.fromHex("#4E410F"),
-      // headerLightColor:  PdfColor.fromHex("#4E410F"),
       headerDarkColor: PdfColor.fromHex("#4E410F"),
       nameColor: PdfColor.fromHex("#4E410F"),
       positionColor: PdfColor.fromHex("#2F2F2F"),
@@ -717,9 +716,9 @@ class Resume8Theme1 {
       dateColor: PdfColor.fromHex("#4E410F"),
       linkColor: PdfColor.fromHex("#4E410F"),
       backgroundColor: PdfColor.fromHex("#FFFFFF"),
-
-      link: PdfAssets.link81,
-
+      emailIc: PdfAssets.email3,
+      phoneIc: PdfAssets.phone3,
+      linkIc: PdfAssets.link81,
       headerFont: headerFont,
       normalFont: normalFont,
       nameFont: nameFont,
@@ -753,8 +752,6 @@ class Resume8Theme2 {
       backgroundColor: PdfColor.fromHex("#FFFFFF"),
       // headerLightColor:  PdfColor.fromHex("#4E410F"),
 
-      link: PdfAssets.link82,
-
       headerFont: headerFont,
       normalFont: normalFont,
       nameFont: nameFont,
@@ -787,9 +784,6 @@ class Resume8Theme3 {
       dateColor: PdfColor.fromHex("#70725E"),
       linkColor: PdfColor.fromHex("#70725E"),
       backgroundColor: PdfColor.fromHex("#FFFFFF"),
-
-      link: PdfAssets.link83,
-
       headerFont: headerFont,
       normalFont: normalFont,
       nameFont: nameFont,
@@ -804,24 +798,36 @@ class Resume8Theme3 {
 }
 
 class Resume9Theme1 {
-  static late Font font;
+  static late Font nameFont;
+  static late Font headerFont;
+  static late Font normalFont;
+
   late Resume9ThemeModel resume9theme1;
   Future<void> getModel() async {
-    resume9theme1 = await getFonts().then((value) => Resume9ThemeModel(
-          normalTextColor: PdfColor.fromHex("#000000"),
-          headerColor: PdfColor.fromHex("#030094"),
-          nameColor: PdfColor.fromHex("#E6E6E6"),
-          positionColor: PdfColor.fromHex("#84AEFF"),
-          boxBottomBorderColor: PdfColor.fromHex("#04025B"),
-          backgroundBoxColor: PdfColor.fromHex('#030094'),
-          subHeaderColor: PdfColor.fromHex("#000000"),
-          bullet: PdfAssets.bullet91,
-          font: font,
-        ));
+    await getFonts();
+    resume9theme1 = Resume9ThemeModel(
+      imageBorder: PdfColor.fromHex("#54616A"),
+      normalTextColor: PdfColor.fromHex("#4E410F"),
+      headerDarkColor: PdfColor.fromHex("#4E410F"),
+      nameColor: PdfColor.fromHex("#4E410F"),
+      positionColor: PdfColor.fromHex("#2F2F2F"),
+      boxColor: PdfColor.fromHex("#FFFFFF"),
+      dateColor: PdfColor.fromHex("#4E410F"),
+      linkColor: PdfColor.fromHex("#4E410F"),
+      backgroundColor: PdfColor.fromHex("#FFFFFF"),
+      emailIc: PdfAssets.email3,
+      phoneIc: PdfAssets.phone3,
+      linkIc: PdfAssets.link81,
+      headerFont: headerFont,
+      normalFont: normalFont,
+      nameFont: nameFont,
+    );
   }
 
   Future<void> getFonts() async {
-    font = await PdfGoogleFonts.outfitRegular();
+    headerFont = await PdfGoogleFonts.dMSansRegular();
+    nameFont = await PdfGoogleFonts.dMSansRegular();
+    normalFont = await PdfGoogleFonts.dMSansRegular();
   }
 }
 
@@ -962,6 +968,7 @@ class Resume14Theme1 {
           emailIc: PdfAssets.email52,
           phoneIc: PdfAssets.phone52,
           linkIc: PdfAssets.link52,
+          imageBorder52: PdfAssets.imageBorder52,
           headerFont: headerFont,
           normalFont: normalFont,
         ));
@@ -988,6 +995,7 @@ class Resume15Theme1 {
           emailIc: PdfAssets.email53,
           phoneIc: PdfAssets.phone53,
           linkIc: PdfAssets.link53,
+          imageBorder53: PdfAssets.imageBorder53,
           headerFont: headerFont,
           normalFont: normalFont,
         ));
@@ -1015,6 +1023,7 @@ class Resume16Theme1 {
       emailIc: PdfAssets.email54,
       phoneIc: PdfAssets.phone54,
       linkIc: PdfAssets.link54,
+      imageBorder54: PdfAssets.imageBorder54,
       headerFont: headerFont,
       normalFont: normalFont,
     );
@@ -1155,7 +1164,7 @@ class Resume21Theme1 {
           linkColor: PdfColor.fromHex("#C69AFF"),
 
           background: PdfAssets.back71,
-          linkIc: PdfAssets.link7,
+          linkIc: PdfAssets.link81,
           bullet71: PdfAssets.bullet7,
 
           headerFont: headerFont,
@@ -1167,6 +1176,270 @@ class Resume21Theme1 {
     headerFont = await PdfGoogleFonts.dMSansRegular();
     nameFont = await PdfGoogleFonts.dMSansRegular();
     normalFont = await PdfGoogleFonts.dMSansRegular();
+  }
+}
+
+class Resume22Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume22ThemeModel resume22theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume22theme1 = Resume22ThemeModel(
+        normalTextColor: PdfColor.fromHex("#FFFFFF"),
+        headerColor: PdfColor.fromHex("#FFFFFF"),
+        nameColor: PdfColor.fromHex("#FFFFFF"),
+        positionColor: PdfColor.fromHex("#87CEEB"),
+        imageBorderColor: PdfColor.fromHex("#FFFFFF"),
+        dateColor: PdfColor.fromHex("#7F8C8D"),
+        linkColor: PdfColor.fromHex("#3498DB"),
+        background: PdfAssets.back72,
+        linkIc: PdfAssets.link82,
+        bullet72: PdfAssets.bullet7,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume23Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume23ThemeModel resume23theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume23theme1 = Resume23ThemeModel(
+        normalTextColor: PdfColor.fromHex("#FFFFFF"),
+        headerColor: PdfColor.fromHex("#FFFFFF"),
+        nameColor: PdfColor.fromHex("#FFFFFF"),
+        positionColor: PdfColor.fromHex("#87CEEB"),
+        imageBorderColor: PdfColor.fromHex("#FFFFFF"),
+        dateColor: PdfColor.fromHex("#7F8C8D"),
+        linkColor: PdfColor.fromHex("#3498DB"),
+        background: PdfAssets.back73,
+        linkIc: PdfAssets.link7,
+        bullet72: PdfAssets.bullet7,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume24Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume24ThemeModel resume24theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume24theme1 = Resume24ThemeModel(
+        normalTextColor: PdfColor.fromHex("#000000"),
+        headerColor: PdfColor.fromHex("#000000"),
+        nameColor: PdfColor.fromHex("#000000"),
+        positionColor: PdfColor.fromHex("#000000"),
+        imageBorderColor: PdfColor.fromHex("#000000"),
+        dateColor: PdfColor.fromHex("#000000"),
+        linkColor: PdfColor.fromHex("#000000"),
+        background: PdfAssets.back81,
+        backgroundColor: PdfColor.fromHex("#F4D34F"),
+        linkIc: PdfAssets.link81,
+        bullet81: PdfAssets.bullet81,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume25Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume25ThemeModel resume25theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume25theme1 = Resume25ThemeModel(
+        normalTextColor: PdfColor.fromHex("#000000"),
+        headerColor: PdfColor.fromHex("#000000"),
+        nameColor: PdfColor.fromHex("#000000"),
+        positionColor: PdfColor.fromHex("#000000"),
+        imageBorderColor: PdfColor.fromHex("#000000"),
+        dateColor: PdfColor.fromHex("#000000"),
+        linkColor: PdfColor.fromHex("#000000"),
+        backgroundColor: PdfColor.fromHex("#A9CBE2"),
+        background: PdfAssets.back82,
+        linkIc: PdfAssets.link82,
+        bullet82: PdfAssets.bullet81,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume26Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume26ThemeModel resume26theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume26theme1 = Resume26ThemeModel(
+        normalTextColor: PdfColor.fromHex("#000000"),
+        headerColor: PdfColor.fromHex("#000000"),
+        nameColor: PdfColor.fromHex("#000000"),
+        positionColor: PdfColor.fromHex("#000000"),
+        imageBorderColor: PdfColor.fromHex("#000000"),
+        dateColor: PdfColor.fromHex("#000000"),
+        linkColor: PdfColor.fromHex("#000000"),
+        backgroundColor: PdfColor.fromHex('#D6E58A'),
+        background: PdfAssets.back83,
+        linkIc: PdfAssets.link83,
+        bullet83: PdfAssets.bullet81,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume27Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume27ThemeModel resume27theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume27theme1 = Resume27ThemeModel(
+        normalTextColor: PdfColor.fromHex("#FFFFFF"),
+        headerColor: PdfColor.fromHex("#FFFFFF"),
+        nameColor: PdfColor.fromHex("#FFFFFF"),
+        positionColor: PdfColor.fromHex("#87CEEB"),
+        imageBorderColor: PdfColor.fromHex("#FFFFFF"),
+        dateColor: PdfColor.fromHex("#7F8C8D"),
+        linkColor: PdfColor.fromHex("#3498DB"),
+        background: PdfAssets.back101,
+        linkIc: PdfAssets.link7,
+        bullet72: PdfAssets.bullet7,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume28Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume28ThemeModel resume28theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume28theme1 = Resume28ThemeModel(
+        normalTextColor: PdfColor.fromHex("#FFFFFF"),
+        headerColor: PdfColor.fromHex("#FFFFFF"),
+        nameColor: PdfColor.fromHex("#FFFFFF"),
+        positionColor: PdfColor.fromHex("#87CEEB"),
+        imageBorderColor: PdfColor.fromHex("#FFFFFF"),
+        dateColor: PdfColor.fromHex("#7F8C8D"),
+        linkColor: PdfColor.fromHex("#3498DB"),
+        background: PdfAssets.back102,
+        linkIc: PdfAssets.link7,
+        bullet81: PdfAssets.bullet7,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume29Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume29ThemeModel resume29theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume29theme1 = Resume29ThemeModel(
+        normalTextColor: PdfColor.fromHex("#FFFFFF"),
+        headerColor: PdfColor.fromHex("#FFFFFF"),
+        nameColor: PdfColor.fromHex("#FFFFFF"),
+        positionColor: PdfColor.fromHex("#87CEEB"),
+        imageBorderColor: PdfColor.fromHex("#FFFFFF"),
+        dateColor: PdfColor.fromHex("#7F8C8D"),
+        linkColor: PdfColor.fromHex("#3498DB"),
+        background: PdfAssets.back103,
+        linkIc: PdfAssets.link7,
+        bullet81: PdfAssets.bullet7,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
+  }
+}
+
+class Resume30Theme1 {
+  static late Font headerFont;
+  static late Font normalFont;
+
+  late Resume30ThemeModel resume30theme1;
+
+  Future<void> getModel() async {
+    await getFonts();
+    resume30theme1 = Resume30ThemeModel(
+        normalTextColor: PdfColor.fromHex("#FFFFFF"),
+        headerColor: PdfColor.fromHex("#FFFFFF"),
+        nameColor: PdfColor.fromHex("#FFFFFF"),
+        positionColor: PdfColor.fromHex("#87CEEB"),
+        imageBorderColor: PdfColor.fromHex("#FFFFFF"),
+        dateColor: PdfColor.fromHex("#7F8C8D"),
+        linkColor: PdfColor.fromHex("#3498DB"),
+        background: PdfAssets.back103,
+        linkIc: PdfAssets.link7,
+        bullet81: PdfAssets.bullet7,
+        headerFont: headerFont,
+        normalFont: normalFont);
+  }
+
+  Future<void> getFonts() async {
+    headerFont = await PdfGoogleFonts.interSemiBold();
+    normalFont = await PdfGoogleFonts.interRegular();
   }
 }
 

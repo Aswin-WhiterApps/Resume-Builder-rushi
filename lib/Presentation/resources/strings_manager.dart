@@ -251,4 +251,37 @@ Best regards,
       '''Dedicated customer service professional with a proven track record of delivering exceptional customer experiences in both retail and call center environments. Skilled in active listening, problem-solving, and resolving complex customer issues with tact and diplomacy. Consistently recognized for maintaining high customer satisfaction scores and building lasting rapport. Seeking an opportunity to leverage strong interpersonal skills and drive positive customer interactions. ''';
   static const String summaryExample5 =
       '''Dynamic and visionary leader with extensive experience in operations management and team leadership. Proven ability to optimize workflows, streamline processes, and drive efficiency improvements resulting in cost savings and enhanced productivity. Skilled in fostering a collaborative work environment, mentoring teams, and aligning departmental goals with overarching organizational objectives. Committed to achieving operational excellence and delivering top-tier results. ''';
+
+  static const Map<String, String> templateNames = {
+    "1": "Regalis",
+    "2": "NobleCraft",
+    "3": "Velour",
+    "4": "Crestline",
+    "5": "IvoryEdge",
+    "6": "Civitas",
+    "7": "Monarch",
+    "8": "Aristia",
+    "9": "Eminence",
+    "10": "Prestige",
+    "11": "Linea",
+    "12": "Clario",
+    "13": "Forme",
+    "14": "Slate",
+    "15": "Axis",
+    "16": "Purefold",
+    "17": "Vertex",
+    "18": "Modera",
+    "19": "Frame",
+    "20": "Neatify",
+    "21": "Boardroom",
+    "22": "Execura",
+    "23": "PrimeRole",
+    "24": "Leadwell",
+    "25": "Corpora",
+    "26": "Summit",
+    "27": "ProSphere",
+    "28": "Stratos",
+    "29": "Director",
+    "30": "EliteCore",
+  };
 }
