@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,11 +25,26 @@ Future<void> main() async {
   // Initialize AdMob with automatic test/production switching
   await AdMobService.initialize();
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-  await Firebase.initializeApp();
+  try {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (e) {
+    print(
+        'SystemChrome orientation setting failed (expected in some test environments): $e');
+  }
+  // Initialize Firebase gracefully
+  try {
+    if (const bool.fromEnvironment('FLUTTER_TEST_ENV') ||
+        Platform.environment.containsKey('FLUTTER_TEST')) {
+      print('Firebase initialization skipped: running in test environment');
+    } else {
+      await Firebase.initializeApp();
+    }
+  } catch (e) {
+    print('Firebase initialization failed: $e');
+  }
 
   // Initialize AI services
   try {
@@ -38,24 +54,24 @@ Future<void> main() async {
     print('AI services initialization failed: $e');
   }
 
-
-
   runApp(MultiBlocProvider(
     providers: [
-             BlocProvider<AuthBloc>(
+      BlocProvider<AuthBloc>(
         create: (_) => AuthBloc(FireUser()),
       ),
-      BlocProvider<ContactBloc>(create: (_) => ContactBloc(fireUser: FireUser()),
+      BlocProvider<ContactBloc>(
+        create: (_) => ContactBloc(fireUser: FireUser()),
       ),
-      BlocProvider<AdditionalBloc>(create: (_) => AdditionalBloc( ),
+      BlocProvider<AdditionalBloc>(
+        create: (_) => AdditionalBloc(),
       ),
       BlocProvider<WorkBloc>(
         create: (_) => WorkBloc(fireUser: FireUser()),
       ),
-         BlocProvider(
-          create: (_) => SummaryBloc(fireUser: FireUser()),
-         ),
-      ],
+      BlocProvider(
+        create: (_) => SummaryBloc(fireUser: FireUser()),
+      ),
+    ],
     child: MyApp(),
   ));
 }

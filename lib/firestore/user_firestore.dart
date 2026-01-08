@@ -6,9 +6,8 @@ import 'package:resume_builder/model/model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FireUser {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
+  FirebaseStorage get _storage => FirebaseStorage.instance;
 
   Future<void> addUser({required UserModel userModel}) {
     return _firestore
@@ -21,7 +20,10 @@ class FireUser {
 
   Future<List<UserModel>> getAllUsers() async {
     final snapshot = await _firestore.collection('users').get();
-    final userData = snapshot.docs.map((e) => UserModel.fromSnapshot(e as DocumentSnapshot<Map<String, dynamic>>)).toList();
+    final userData = snapshot.docs
+        .map((e) =>
+            UserModel.fromSnapshot(e as DocumentSnapshot<Map<String, dynamic>>))
+        .toList();
     return userData;
   }
 
@@ -40,7 +42,8 @@ class FireUser {
     }
   }
 
-  Future<bool> addSubscriptionDetails(SubscriptionDetail subscriptionDetail) async {
+  Future<bool> addSubscriptionDetails(
+      SubscriptionDetail subscriptionDetail) async {
     final String? userId = Auth().currentUser?.uid;
     if (userId == null) {
       print("❌ Cannot add subscription: User not logged in.");
@@ -87,7 +90,8 @@ class FireUser {
     }
   }
 
-  Future<String?> createNewResume({required String userId, required String title}) async {
+  Future<String?> createNewResume(
+      {required String userId, required String title}) async {
     try {
       final docRef = await _firestore
           .collection('users')
@@ -114,8 +118,10 @@ class FireUser {
           .collection('resumes')
           .orderBy('createdAt', descending: true)
           .get();
-      return snapshot.docs.map((doc) => ResumeModel.fromFirestore(doc)).toList();
-    } catch(e) {
+      return snapshot.docs
+          .map((doc) => ResumeModel.fromFirestore(doc))
+          .toList();
+    } catch (e) {
       print("❌ Error fetching resumes for user: $e");
       return [];
     }
@@ -126,8 +132,11 @@ class FireUser {
     required String resumeId,
   }) async {
     print("Attempting to delete resume: $resumeId for user: $userId");
-    final resumeRef =
-    _firestore.collection('users').doc(userId).collection('resumes').doc(resumeId);
+    final resumeRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('resumes')
+        .doc(resumeId);
 
     try {
       final subcollections = ['work_experiences', 'educations', 'sections'];
@@ -157,17 +166,21 @@ class FireUser {
       batch.delete(doc.reference);
     }
     await batch.commit();
-    print("✅ Deleted ${snapshot.docs.length} documents from '$collectionName'.");
+    print(
+        "✅ Deleted ${snapshot.docs.length} documents from '$collectionName'.");
   }
 
-  Future<void> saveIntroForResume({required String userId, required String resumeId, required IntroModel intro}) {
+  Future<void> saveIntroForResume(
+      {required String userId,
+      required String resumeId,
+      required IntroModel intro}) {
     return _firestore
         .collection('users')
         .doc(userId)
         .collection('resumes')
         .doc(resumeId)
         .set({'intro': intro.toMap()}, SetOptions(merge: true))
-    .then((_) => print("✅ Intro section saved successfully."))
+        .then((_) => print("✅ Intro section saved successfully."))
         .catchError((error) => print("❌ Error saving intro section: $error"));
   }
 
@@ -187,7 +200,10 @@ class FireUser {
         .catchError((error) => print("❌ Failed to update intro image: $error"));
   }
 
-  Future<void> saveContactForResume({required String userId, required String resumeId, required ContactModel contact}) {
+  Future<void> saveContactForResume(
+      {required String userId,
+      required String resumeId,
+      required ContactModel contact}) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -196,7 +212,10 @@ class FireUser {
         .set({'contact': contact.toMap()}, SetOptions(merge: true));
   }
 
-  Future<DocumentReference> addWorkExperience({required String userId, required String? resumeId, required WorkModel work}) {
+  Future<DocumentReference> addWorkExperience(
+      {required String userId,
+      required String? resumeId,
+      required WorkModel work}) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -206,7 +225,8 @@ class FireUser {
         .add(work.toMap());
   }
 
-  Future<List<WorkModel>> getWorkExperiences({required String? userId, required String? resumeId}) async {
+  Future<List<WorkModel>> getWorkExperiences(
+      {required String? userId, required String? resumeId}) async {
     final snapshot = await _firestore
         .collection('users')
         .doc(userId)
@@ -222,11 +242,9 @@ class FireUser {
     required String resumeId,
     required WorkModel work,
   }) {
-
     final String? workId = work.id;
 
     if (workId == null || workId.isEmpty) {
-
       throw ArgumentError('WorkModel must have a non-null ID to be updated.');
     }
     return _firestore
@@ -239,7 +257,10 @@ class FireUser {
         .update(work.toMap());
   }
 
-  Future<void> deleteWorkExperience({required String userId, required String resumeId, required String workId}) {
+  Future<void> deleteWorkExperience(
+      {required String userId,
+      required String resumeId,
+      required String workId}) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -250,7 +271,10 @@ class FireUser {
         .delete();
   }
 
-  Future<DocumentReference> addEducation({required String userId, required String resumeId, required EducationModel education}) {
+  Future<DocumentReference> addEducation(
+      {required String userId,
+      required String resumeId,
+      required EducationModel education}) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -260,7 +284,8 @@ class FireUser {
         .add(education.toMap());
   }
 
-  Future<List<EducationModel>> getEducations({required String userId, required String resumeId}) async {
+  Future<List<EducationModel>> getEducations(
+      {required String userId, required String resumeId}) async {
     final snapshot = await _firestore
         .collection('users')
         .doc(userId)
@@ -268,11 +293,15 @@ class FireUser {
         .doc(resumeId)
         .collection('educations')
         .get();
-    return snapshot.docs.map((doc) => EducationModel.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => EducationModel.fromFirestore(doc))
+        .toList();
   }
 
-  Future<void> updateEducation({required String userId, required String resumeId, required EducationModel education}) {
-
+  Future<void> updateEducation(
+      {required String userId,
+      required String resumeId,
+      required EducationModel education}) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -283,7 +312,10 @@ class FireUser {
         .update(education.toMap());
   }
 
-  Future<void> deleteEducation({required String userId, required String resumeId, required String educationId}) {
+  Future<void> deleteEducation(
+      {required String userId,
+      required String resumeId,
+      required String educationId}) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -369,34 +401,56 @@ class FireUser {
   }) async {
     try {
       final snapshot = await _firestore
-          .collection('users').doc(userId).collection('resumes').doc(resumeId).collection('sections').get();
-      return snapshot.docs.map((doc) => SectionModel.fromFirestore(doc)).toList();
+          .collection('users')
+          .doc(userId)
+          .collection('resumes')
+          .doc(resumeId)
+          .collection('sections')
+          .get();
+      return snapshot.docs
+          .map((doc) => SectionModel.fromFirestore(doc))
+          .toList();
     } catch (e) {
       print("❌ Error fetching sections: $e");
       return [];
     }
   }
 
-  Future<void> saveSection({required String userId, required String resumeId, required SectionModel section}) {
+  Future<void> saveSection(
+      {required String userId,
+      required String resumeId,
+      required SectionModel section}) {
     return _firestore
-        .collection('users').doc(userId)
-        .collection('resumes').doc(resumeId)
-        .collection('sections').doc(section.id)
+        .collection('users')
+        .doc(userId)
+        .collection('resumes')
+        .doc(resumeId)
+        .collection('sections')
+        .doc(section.id)
         .set(section.toMap(), SetOptions(merge: true));
   }
 
-  Future<void> deleteSection({required String userId, required String resumeId, required String sectionId}) {
+  Future<void> deleteSection(
+      {required String userId,
+      required String resumeId,
+      required String sectionId}) {
     return _firestore
-        .collection('users').doc(userId)
-        .collection('resumes').doc(resumeId)
-        .collection('sections').doc(sectionId)
+        .collection('users')
+        .doc(userId)
+        .collection('resumes')
+        .doc(resumeId)
+        .collection('sections')
+        .doc(sectionId)
         .delete();
   }
 
-  Future<List<SectionModel>> getAllSections({required String userId, required String resumeId}) async {
+  Future<List<SectionModel>> getAllSections(
+      {required String userId, required String resumeId}) async {
     final snapshot = await _firestore
-        .collection('users').doc(userId)
-        .collection('resumes').doc(resumeId)
+        .collection('users')
+        .doc(userId)
+        .collection('resumes')
+        .doc(resumeId)
         .collection('sections')
         .get();
     return snapshot.docs.map((doc) => SectionModel.fromFirestore(doc)).toList();
@@ -425,7 +479,6 @@ class FireUser {
 //       print("❌ Error initializing default sections: $e");
 //     }
 //   }
-
 
   Future<void> saveCoverLetterForResume({
     required String userId,
@@ -485,14 +538,15 @@ class FireUser {
       final ref = _storage.ref('$storagePath/$userId/$resumeId/signature.jpg');
       await ref.delete();
       print("✅ File deleted from Storage.");
-    } catch(e) {
+    } catch (e) {
       if (e is FirebaseException && e.code != 'object-not-found') {
         print("❌ Error deleting file from Storage: $e");
       }
     }
   }
 
-  Future<void> initializeDefaultSections({required String userId, required String resumeId}) async {
+  Future<void> initializeDefaultSections(
+      {required String userId, required String resumeId}) async {
     try {
       final batch = _firestore.batch();
       final sectionsCollection = _firestore
@@ -503,7 +557,8 @@ class FireUser {
           .collection('sections');
 
       for (final sectionName in defaultSectionNames) {
-        final section = SectionModel(id: sectionName, value: '', description: '');
+        final section =
+            SectionModel(id: sectionName, value: '', description: '');
         final docRef = sectionsCollection.doc(section.id);
         batch.set(docRef, section.toMap());
       }
@@ -513,10 +568,7 @@ class FireUser {
       print("❌ Error initializing default sections: $e");
     }
   }
-
 }
-
-
 
 const List<String> defaultSectionNames = [
   'Accomplishments',

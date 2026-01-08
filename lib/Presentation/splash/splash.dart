@@ -66,89 +66,100 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                 fit: BoxFit.cover,
               ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(height: 115),
-                    SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(1, 0),
-                        end: Offset.zero,
-                      ).animate(_animationController),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: AppPadding.p20),
-                        child: Row(children: []),
-                      ),
-                    ),
-                    FadeTransition(
-                      opacity: _animationController,
-                      child: Text(
-                        AppStrings.appBarTitle,
-                        style: TextStyle(
-                          color: ColorManager.primary,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w300,
-                          fontFamily: FontFamily.emblema,
-                        ),
-                      ),
-                    ),
-                    SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(-1, 0),
-                        end: Offset.zero,
-                      ).animate(_animationController),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: AppPadding.p20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 60),
-                    FadeTransition(
-                      opacity: _animationController,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Image.asset(
-                          ImageAssets.appLogo,
-                          width: 200,
-                          height: 200,
-                        ),
-                      ),
-                    ),
-                  ],
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
                 ),
-                Column(
+                child: Column(
                   children: [
-                    FadeTransition(
-                      opacity: _animationController,
-                      child: Image.asset(
-                        ImageAssets.Whiterapps_logo,
-                        width: 50,
-                        height: 50,
-                      ),
-                    ),
-                    FadeTransition(
-                      opacity: _animationController,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 30),
-                        child: Text(
-                          AppStrings.splashStatement,
-                          style: TextStyle(
-                            color: ColorManager.primary,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w300,
-                            fontFamily: FontFamily.emblema,
+                    const SizedBox(height: 80),
+                    Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(1, 0),
+                            end: Offset.zero,
+                          ).animate(_animationController),
+                          child: const Padding(
+                            padding:
+                                EdgeInsets.symmetric(vertical: AppPadding.p20),
+                            child: Row(children: []),
                           ),
                         ),
-                      ),
+                        FadeTransition(
+                          opacity: _animationController,
+                          child: Text(
+                            AppStrings.appBarTitle,
+                            style: TextStyle(
+                              color: ColorManager.primary,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w300,
+                              fontFamily: FontFamily.emblema,
+                            ),
+                          ),
+                        ),
+                        SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(-1, 0),
+                            end: Offset.zero,
+                          ).animate(_animationController),
+                          child: const Padding(
+                            padding:
+                                EdgeInsets.symmetric(vertical: AppPadding.p20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        FadeTransition(
+                          opacity: _animationController,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Image.asset(
+                              ImageAssets.appLogo,
+                              width: 200,
+                              height: 200,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 50),
+                    Column(
+                      children: [
+                        FadeTransition(
+                          opacity: _animationController,
+                          child: Image.asset(
+                            ImageAssets.Whiterapps_logo,
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        FadeTransition(
+                          opacity: _animationController,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 30),
+                            child: Text(
+                              AppStrings.splashStatement,
+                              style: TextStyle(
+                                color: ColorManager.primary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w300,
+                                fontFamily: FontFamily.emblema,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

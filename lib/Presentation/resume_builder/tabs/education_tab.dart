@@ -674,9 +674,9 @@ class EducationTabViewState extends State<EducationTabView> {
 
     setState(() {
       _educationList = (list
-              .where((education) => education != null)
-              .cast<EducationModel>()
-              .toList());
+          .where((education) => education != null)
+          .cast<EducationModel>()
+          .toList());
       // Sort by sortOrder to ensure correct order
       _educationList
           .sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
@@ -847,149 +847,135 @@ class EducationTabViewState extends State<EducationTabView> {
     return Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: ColorManager.tabBackground,
-        body: Stack(
-         
-          children: [
-          _educationList.isEmpty
-              ? Container(
-                  child: Padding(
-                      padding: EdgeInsets.only(
-                        top: 16,
-                      ),
-                      child: _getEducationForm()))
-              : Padding(
-                  padding:
-                      EdgeInsets.only(bottom: 80, left: 16, right: 16, top: 26),
-                      
-                  child: ListView.builder(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 16 : 150,
+        body: Stack(children: [
+          if (_educationList.isEmpty)
+            _getEducationForm()
+          else
+            Padding(
+              padding:
+                  EdgeInsets.only(bottom: 80, left: 16, right: 16, top: 26),
+              child: ListView.builder(
+                padding: EdgeInsets.only(
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom > 0 ? 16 : 100,
+                ),
+                physics: AlwaysScrollableScrollPhysics(),
+                itemCount: _educationList.length,
+                itemBuilder: (context, index) {
+                  EducationModel education = _educationList[index];
+
+                  final String schoolName = (education.schoolName ?? '').trim();
+                  final String from = (education.dateFrom ?? '').trim();
+                  final String to = ((education.present ?? false)
+                          ? 'Present'
+                          : (education.dateTo ?? ''))
+                      .trim();
+                  final String dateRange = [
+                    if (from.isNotEmpty) from,
+                    if (to.isNotEmpty) to,
+                  ].join(' - ');
+
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: AppPadding.p8),
+                    padding: EdgeInsets.all(AppPadding.p12),
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      color: ColorManager.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                            blurRadius: 5,
+                            color: Colors.black38,
+                            offset: Offset.fromDirection(2, 2))
+                      ],
                     ),
-                    physics: AlwaysScrollableScrollPhysics(),
-                    itemCount: _educationList.length,
-                    itemBuilder: (context, index) {
-                      EducationModel education = _educationList[index];
-
-                      final String schoolName =
-                          (education.schoolName ?? '').trim();
-                      final String from = (education.dateFrom ?? '').trim();
-                      final String to = ((education.present ?? false)
-                              ? 'Present'
-                              : (education.dateTo ?? ''))
-                          .trim();
-                      final String dateRange = [
-                        if (from.isNotEmpty) from,
-                        if (to.isNotEmpty) to,
-                      ].join(' - ');
-
-                      return Container(
-                        margin: EdgeInsets.symmetric(vertical: AppPadding.p8),
-                        padding: EdgeInsets.all(AppPadding.p12),
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          color: ColorManager.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                                blurRadius: 5,
-                                color: Colors.black38,
-                                offset: Offset.fromDirection(2, 2))
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: AppPadding.p12,
-                              top: 7,
-                              bottom: AppPadding.p12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                schoolName.isEmpty
-                                    ? AppStrings.whtSchool
-                                    : schoolName,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: AppPadding.p12, top: 7, bottom: AppPadding.p12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            schoolName.isEmpty
+                                ? AppStrings.whtSchool
+                                : schoolName,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: FontSize.s20),
+                          ),
+                          if (dateRange.isNotEmpty)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: AppPadding.p8),
+                              child: Text(
+                                dateRange,
                                 style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: FontSize.s20),
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: FontSize.s14,
+                                ),
                               ),
-                              if (dateRange.isNotEmpty)
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: AppPadding.p8),
-                                  child: Text(
-                                    dateRange,
-                                    style: TextStyle(
-                                      color: Colors.black54,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: FontSize.s14,
-                                    ),
+                            ),
+                          SizedBox(
+                            height: FontSize.s18,
+                          ),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () =>
+                                    _showEducationForm(education: education),
+                                child: Text(
+                                  AppStrings.edit,
+                                  style: TextStyle(
+                                      color: ColorManager.secondary,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              SizedBox(
+                                width: FontSize.s35,
+                              ),
+                              GestureDetector(
+                                onTap: () => _showDeleteConfirmationDialog(
+                                    context, education.id),
+                                child: Text(
+                                  AppStrings.delete,
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              SizedBox(
-                                height: FontSize.s18,
                               ),
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => _showEducationForm(
-                                        education: education),
-                                    child: Text(
-                                      AppStrings.edit,
-                                      style: TextStyle(
-                                          color: ColorManager.secondary,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: FontSize.s35,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => _showDeleteConfirmationDialog(
-                                        context, education.id),
-                                    child: Text(
-                                      AppStrings.delete,
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  IconButton(
-                                      onPressed:
-                                          index == _educationList.length - 1
-                                              ? null
-                                              : () => _moveDown(index),
-                                      icon: Icon(
-                                        Icons.arrow_downward_outlined,
-                                        color:
-                                            index == _educationList.length - 1
-                                                ? Colors.grey
-                                                : ColorManager.secondary,
-                                      )),
-                                  IconButton(
-                                    onPressed: index == 0
-                                        ? null
-                                        : () => _moveUp(index),
-                                    icon: Icon(
-                                      Icons.arrow_upward_outlined,
-                                      color: index == 0
-                                          ? Colors.grey
-                                          : ColorManager.secondary,
-                                    ),
-                                  ),
-                                ],
+                              const Spacer(),
+                              IconButton(
+                                  onPressed: index == _educationList.length - 1
+                                      ? null
+                                      : () => _moveDown(index),
+                                  icon: Icon(
+                                    Icons.arrow_downward_outlined,
+                                    color: index == _educationList.length - 1
+                                        ? Colors.grey
+                                        : ColorManager.secondary,
+                                  )),
+                              IconButton(
+                                onPressed:
+                                    index == 0 ? null : () => _moveUp(index),
+                                icon: Icon(
+                                  Icons.arrow_upward_outlined,
+                                  color: index == 0
+                                      ? Colors.grey
+                                      : ColorManager.secondary,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                      
-                ),
-              
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           if (_educationList.isNotEmpty)
             Positioned(
               bottom: 120,
@@ -1021,7 +1007,6 @@ class EducationTabViewState extends State<EducationTabView> {
 
   Widget _getEducationForm() {
     return LayoutBuilder(
-      
       builder: (context, constraints) {
         return SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
@@ -1219,7 +1204,9 @@ class EducationTabViewState extends State<EducationTabView> {
                       ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).viewInsets.bottom > 0 ? 16 : 100,
+                      height: MediaQuery.of(context).viewInsets.bottom > 0
+                          ? 10
+                          : 40,
                     ),
                   ],
                 ),

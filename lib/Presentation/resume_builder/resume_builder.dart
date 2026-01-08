@@ -603,18 +603,19 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
           controller: _tabController,
           children: tabsViewList(),
         ),
-
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomSheet: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _getSkipButton(),
-            _getNextButton(),
-            SizedBox(
-              height: 20,
-            ),
-          ],
-        ), //Next Button
+        bottomSheet: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _getSkipButton(),
+              _getNextButton(),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
