@@ -46,22 +46,22 @@ class AppStrings {
   static const String or = "OR";
   static const String skip = "Skip";
 
-  static const String whtCompany = "WHAT WAS THE COMPANY OR ORGANIZATION NAME?";
+  static const String whtCompany = "What Was The Company Or Organization Name?";
   static const String whtCompanyHint = "Example Co.";
-  static const String whereCompany = "WHERE WAS THE COMPANY LOCATED?";
-  static const String whereCompanyHint = "Astoria, NY";
-  static const String posCompany = "WHAT WAS YOUR POSITION?";
+  static const String whereCompany = "Where Was The Company Located?";
+  static const String whereCompanyHint = "Location";
+  static const String posCompany = "What Was Your Position?";
   static const String posCompanyHint = "Associate";
-  static const String posCompanyFrom = "I WORKED AT THIS POSITION FROM:";
-  static const String until = "UNTIL:";
+  static const String posCompanyFrom = "I Worked At This Position From:";
+  static const String until = "Until:";
   static const String additionalHeader = "Additional Sections";
 
-  static const String whtSchool = "WHICH SCHOOL DID YOU ATTEND?";
-  static const String whtSchoolHint = "Harvad University";
-  static const String attendedFrom = "I ATTENDED THIS INSTITUTION FROM:";
-  static const String attendedFromHint = "mm  yyyy";
+  static const String whtSchool = "Provide Your Educational Details";
+  static const String whtSchoolHint = "ABC Educational Institution";
+  static const String attendedFrom = "I Attended This Institution From:";
+  static const String attendedFromHint = "mm - yyyy";
   static const String exDate = "e.g. 12/2018, or Dec 2018.";
-  static const String to = "TO:";
+  static const String to = "To:";
   static const String present = "PRESENT";
   static const String signIn = "Sign in";
   static const String signUp = "Sign up";
@@ -86,18 +86,18 @@ class AppStrings {
   static const String other = "Other";
   static const String downloadPDF = "Download PDF";
 
-  static const String emailAddress = "EMAIL ADDRESS ";
-  static const String phoneNumber = "PHONE NUMBER";
-  static const String socialMediaURL = "SOCIAL MEDIA URL (E.G. LINKEDIN)";
-  static const String personnelWeb = "PERSONAL WEBSITE";
-  static const String whtAddress = "WHAT IS YOUR ADDRESS?";
+  static const String emailAddress = "Email Address ";
+  static const String phoneNumber = "Phone Number";
+  static const String socialMediaURL = "Scoial Media URL (E.G. LINKEDIN)";
+  static const String personnelWeb = "Personal Website";
+  static const String whtAddress = "What Is Your Address?";
 
   static const String emailHint = "o.420@appleseed.com";
   static const String phoneHint = "+ 91 617945613";
-  static const String socialMediaHint = "linkedin.com/example";
-  static const String personnelWebHint = "www.example.com";
-  static const String addr1Hint = "Primera Avenida 1";
-  static const String addr2Hint = "Astoria, NY11102";
+  static const String socialMediaHint = "linkedin.com/example (Optional)";
+  static const String personnelWebHint = "www.example.com (Optional)";
+  static const String addr1Hint = "Street Address (Optional)";
+  static const String addr2Hint = "City, State, ZIP Code (Optional)";
 
   static const String touButton = "Term of Use";
   static const String shareButton = "Share";

@@ -6,6 +6,7 @@ import 'package:resume_builder/Presentation/resources/color_manager.dart';
 import 'package:resume_builder/Presentation/resources/route_manager.dart';
 import 'package:resume_builder/Presentation/resources/strings_manager.dart';
 import 'package:resume_builder/Presentation/resources/values_manager.dart';
+import 'package:resume_builder/Presentation/resources/font_manager.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -94,7 +95,7 @@ Future<void> getFeedbackDialog(BuildContext context) async {
                         await launchUrl(mail);
                       },
                       child: Text(
-                        AppStrings.sendFeedBack.toUpperCase(),
+                        AppStrings.sendFeedBack,
                         style: TextStyle(
                           color: ColorManager.secondary,
                           fontWeight: FontWeight.bold,
@@ -149,8 +150,8 @@ Widget getPPButton() {
             "Privacy Policy",
             style: TextStyle(
               color: textColor,
+              fontSize: FontSize.s16 * 2,
             ),
-            textScaleFactor: 2,
           ),
           style: ElevatedButton.styleFrom(
               elevation: AppSize.s8,
@@ -183,6 +184,7 @@ Widget getTouButton() {
                 color: ColorManager.secondary,
                 width: 1.6,
                 strokeAlign: BorderSide.strokeAlignOutside)),
+        clipBehavior: Clip.antiAlias,
         child: ElevatedButton(
           onPressed: () {
             Navigator.of(context).pushReplacementNamed(Routes.touPage);
@@ -204,12 +206,12 @@ Widget getTouButton() {
             AppStrings.touButton,
             style: TextStyle(
               color: textColor,
+              fontSize: FontSize.s16,
             ),
-            textScaleFactor: 2,
           ),
           style: ElevatedButton.styleFrom(
               elevation: AppSize.s8,
-              minimumSize: Size(200, 50),
+              minimumSize: Size(double.infinity, 50),
               backgroundColor: backColor,
               shape: StadiumBorder()),
         ),
@@ -238,6 +240,7 @@ Widget getShareButton() {
                 color: ColorManager.secondary,
                 width: 1.6,
                 strokeAlign: BorderSide.strokeAlignOutside)),
+        clipBehavior: Clip.antiAlias,
         child: ElevatedButton(
           onPressed: () async {
             setState(() {
@@ -262,12 +265,12 @@ Widget getShareButton() {
             AppStrings.shareButton,
             style: TextStyle(
               color: textColor,
+              fontSize: FontSize.s16,
             ),
-            textScaler: TextScaler.linear(2),
           ),
           style: ElevatedButton.styleFrom(
               elevation: AppSize.s8,
-              minimumSize: Size(200, 50),
+              minimumSize: Size(double.infinity, 50),
               backgroundColor: backColor,
               shape: StadiumBorder()),
         ),
@@ -283,6 +286,7 @@ Widget getSufButton() {
   return StatefulBuilder(
     builder: (BuildContext context, StateSetter setState) {
       return Container(
+          alignment: Alignment.center,
           margin: EdgeInsets.symmetric(horizontal: 30),
           // height: double.infinity,
           width: double.infinity,
@@ -297,6 +301,7 @@ Widget getSufButton() {
                   color: ColorManager.secondary,
                   width: 1.6,
                   strokeAlign: BorderSide.strokeAlignOutside)),
+          clipBehavior: Clip.antiAlias,
           child: ElevatedButton(
             onPressed: () async {
               setState(() {
@@ -319,12 +324,12 @@ Widget getSufButton() {
               AppStrings.sufButton,
               style: TextStyle(
                 color: textColor,
+                fontSize: FontSize.s16,
               ),
-              textScaler: TextScaler.linear(2),
             ),
             style: ElevatedButton.styleFrom(
-                elevation: AppSize.s8,
-                minimumSize: Size(200, 50),
+                elevation: AppSize.s10,
+                minimumSize: Size(double.infinity, 50),
                 backgroundColor: backColor,
                 shape: StadiumBorder()),
           ));

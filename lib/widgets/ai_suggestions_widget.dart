@@ -261,11 +261,19 @@ class _AISuggestionsWidgetState extends State<AISuggestionsWidget> {
                           ),
                         ),
                         const Spacer(),
-                        IconButton(
+                        ElevatedButton(
                           onPressed: () => widget.onSuggestionSelected(suggestion),
-                          icon: Icon(Icons.check_circle_outline, color: Colors.green[600]),
-                          tooltip: 'Use this suggestion',
-                          iconSize: 20,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[600],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'Use this summary',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                       ],
                     ),

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:resume_builder/main.dart' as app;
+import 'package:resume_builder/app/app.dart';
+import 'package:resume_builder/blocs/additional_tab/additional_bloc.dart';
+import 'package:resume_builder/blocs/auth/auth_bloc.dart';
+import 'package:resume_builder/blocs/work/work_bloc.dart';
+import 'package:resume_builder/blocs/contact_tab/contact_bloc.dart';
+import 'package:resume_builder/blocs/summary/summary_bloc.dart';
+import 'package:resume_builder/firestore/user_firestore.dart';
 
 /// Integration test configuration and utilities
 class IntegrationTestConfig {
@@ -11,8 +18,32 @@ class IntegrationTestConfig {
   /// Initialize the app for integration testing
   static Future<void> initApp() async {
     IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-    app.main();
-    await Future.delayed(const Duration(seconds: 2)); // Wait for app initialization
+    // Don't call app.main() here as it can cause zone mismatches
+    await Future.delayed(const Duration(seconds: 1)); // Wait for any async setup
+  }
+  
+  /// Initialize the app widget for testing
+  static Widget createTestApp() {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(FireUser()),
+        ),
+        BlocProvider<ContactBloc>(
+          create: (_) => ContactBloc(fireUser: FireUser()),
+        ),
+        BlocProvider<AdditionalBloc>(
+          create: (_) => AdditionalBloc(),
+        ),
+        BlocProvider<WorkBloc>(
+          create: (_) => WorkBloc(fireUser: FireUser()),
+        ),
+        BlocProvider(
+          create: (_) => SummaryBloc(fireUser: FireUser()),
+        ),
+      ],
+      child: MyApp(),
+    );
   }
   
   /// Wait for a widget to appear with timeout

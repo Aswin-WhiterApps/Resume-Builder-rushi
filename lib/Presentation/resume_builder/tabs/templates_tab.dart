@@ -176,7 +176,7 @@ class _TemplateTabViewState extends State<TemplateTabView> {
         _getTemplateItem(
             item_id: "29", thumbnail: ImageAssets.template33, isPremium: true),
         _getTemplateItem(
-            item_id: "30", thumbnail: ImageAssets.template34, isPremium: false),
+            item_id: "30", thumbnail: ImageAssets.template34, isPremium: true),
       ];
 
   Widget _getTemplateItem(

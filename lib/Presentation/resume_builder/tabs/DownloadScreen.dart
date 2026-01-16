@@ -16,9 +16,18 @@ class DownloadScreen extends StatelessWidget {
   // Function to save the PDF to the device's Downloads folder
   Future<void> _saveToDownloads(BuildContext context) async {
     try {
-      // Get the Downloads directory (or fallback to app documents directory)
-      final directory = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
-      final newPath = '${directory.path}/Resume_${DateTime.now().toIso8601String().replaceAll(':', '-')}.pdf';
+      // getExternalStorageDirectory is only supported on Android.
+      // For iOS, we use getApplicationDocumentsDirectory.
+      final directory = Platform.isAndroid
+          ? await getExternalStorageDirectory()
+          : await getApplicationDocumentsDirectory();
+
+      if (directory == null) {
+        throw Exception("Could not find storage directory");
+      }
+
+      final newPath =
+          '${directory.path}/Resume_${DateTime.now().toIso8601String().replaceAll(':', '-')}.pdf';
       final newFile = await resumePdf.copy(newPath);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -37,18 +46,18 @@ class DownloadScreen extends StatelessWidget {
   Future<Map<String, dynamic>> _performAtsCheck() async {
     try {
       print('🔍 Starting ATS check...');
-      
+
       // Use the centralized ATSCheckingService which is connected to OpenAI
       // Note: In a real app, we would extract text from the PDF file here.
       // Since we don't have a PDF extractor handy, we pass a placeholder.
       // Ideally, this screen should be passed the resume data object if possible.
       final atsResult = await ATSCheckingService.instance.analyzeResume(
-        resumeContent: 'Resume content placeholder for analysis', 
+        resumeContent: 'Resume content placeholder for analysis',
         jobDescription: null,
         pdfFile: resumePdf,
         comprehensiveData: null,
       );
-      
+
       return {
         'status': 'success',
         'source': 'ats_checking_service',
@@ -147,9 +156,11 @@ class DownloadScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       // Show analysis details
                       if (result.containsKey('analysis'))
-                        ..._buildAnalysisDetails(result['analysis'] as Map<String, dynamic>),
+                        ..._buildAnalysisDetails(
+                            result['analysis'] as Map<String, dynamic>),
                       // Show suggestions
-                      if (result.containsKey('suggestions') && (result['suggestions'] as List).isNotEmpty) ...[
+                      if (result.containsKey('suggestions') &&
+                          (result['suggestions'] as List).isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Text(
                           'Suggestions:',
@@ -160,32 +171,42 @@ class DownloadScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        ...(result['suggestions'] as List).map((suggestion) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.lightbulb_outline, size: 16, color: Colors.amber),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  suggestion.toString(),
-                                  style: TextStyle(
-                                    fontSize: FontSize.s14,
-                                    color: ColorManager.grey,
+                        ...(result['suggestions'] as List)
+                            .map((suggestion) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.lightbulb_outline,
+                                          size: 16, color: Colors.amber),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          suggestion.toString(),
+                                          style: TextStyle(
+                                            fontSize: FontSize.s14,
+                                            color: ColorManager.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
+                                )),
                       ],
                       // Show other result entries
                       ...result.entries
-                          .where((e) => !['score', 'analysis', 'suggestions', 'source', 'status'].contains(e.key))
+                          .where((e) => ![
+                                'score',
+                                'analysis',
+                                'suggestions',
+                                'source',
+                                'status'
+                              ].contains(e.key))
                           .map(
                             (e) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
                               child: Text(
                                 '${e.key}: ${e.value}',
                                 style: TextStyle(
@@ -210,7 +231,7 @@ class DownloadScreen extends StatelessWidget {
   // Helper method to build analysis details
   List<Widget> _buildAnalysisDetails(Map<String, dynamic> analysis) {
     final widgets = <Widget>[];
-    
+
     if (analysis.containsKey('score')) {
       widgets.add(
         Padding(
@@ -226,7 +247,7 @@ class DownloadScreen extends StatelessWidget {
         ),
       );
     }
-    
+
     if (analysis.containsKey('keywords')) {
       widgets.add(
         Padding(
@@ -241,7 +262,7 @@ class DownloadScreen extends StatelessWidget {
         ),
       );
     }
-    
+
     if (analysis.containsKey('match')) {
       widgets.add(
         Padding(
@@ -256,7 +277,7 @@ class DownloadScreen extends StatelessWidget {
         ),
       );
     }
-    
+
     if (analysis.containsKey('analysis')) {
       widgets.add(
         Padding(
@@ -271,7 +292,7 @@ class DownloadScreen extends StatelessWidget {
         ),
       );
     }
-    
+
     return widgets;
   }
 
@@ -328,7 +349,8 @@ class DownloadScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AtsCheckingScreen(initialResumeFile: resumePdf),
+                    builder: (context) =>
+                        AtsCheckingScreen(initialResumeFile: resumePdf),
                   ),
                 );
               },

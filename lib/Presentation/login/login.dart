@@ -11,6 +11,7 @@ import 'package:resume_builder/blocs/auth/auth_bloc.dart';
 import 'package:resume_builder/blocs/auth/auth_event.dart';
 import 'package:resume_builder/blocs/auth/auth_state.dart';
 import 'package:resume_builder/constants/colours.dart';
+import 'package:resume_builder/utils/navigation_helper.dart';
 import 'package:wc_form_validators/wc_form_validators.dart';
 import '../resources/assets_manager.dart';
 import '../resources/strings_manager.dart';
@@ -39,21 +40,22 @@ class _LoginViewState extends State<LoginView> {
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthLoading) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => const Center(
-                  child: SpinKitFadingCircle(
-                color: Colors.blue,
-                size: 50.0,
-              )),
+            NavigationHelper.safeShowAuthDialog(
+              context,
+              const Center(
+                child: SpinKitFadingCircle(
+                  color: Colors.blue,
+                  size: 50.0,
+                ),
+              ),
             );
           } else {
-            Navigator.of(context, rootNavigator: true).pop();
+            NavigationHelper.safeRemoveAuthDialog(context);
           }
 
           if (state is AuthAuthenticated) {
-            Navigator.pushReplacementNamed(context, Routes.homescreen);
+            // Use enhanced navigation for auth success
+            NavigationHelper.navigateToHomeAfterAuth(context);
           } else if (state is AuthError) {
             showAlertDialog(context, message: state.message);
           }
@@ -127,6 +129,7 @@ class _LoginViewState extends State<LoginView> {
                     const SizedBox(height: 20),
                     FloatingActionButton(
                       backgroundColor: Colors.white,
+                      tooltip: 'Sign in with Google',
                       child: SvgPicture.asset(
                         ImageAssets.googleIc,
                         height: 35,
@@ -147,29 +150,33 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _getSignInButton() {
-    return ElevatedButton(
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          final email = _emailController.text.trim();
-          final password = _passController.text.trim();
+    return Semantics(
+      button: true,
+      label: 'Sign In Button',
+      child: ElevatedButton(
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            final email = _emailController.text.trim();
+            final password = _passController.text.trim();
 
-          context.read<AuthBloc>().add(
-                LoginWithEmailPassword(email: email, password: password),
-              );
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: ColorManager.primary,
-        shape: const StadiumBorder(),
-        minimumSize: const Size(double.infinity, 40),
-      ),
-      child: Text(
-        AppStrings.signIn,
-        textScaler: const TextScaler.linear(1.5),
-        style: TextStyle(
-          fontFamily: FontFamily.roboto,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
+            context.read<AuthBloc>().add(
+                  LoginWithEmailPassword(email: email, password: password),
+                );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorManager.primary,
+          shape: const StadiumBorder(),
+          minimumSize: const Size(double.infinity, 40),
+        ),
+        child: Text(
+          AppStrings.signIn,
+          style: TextStyle(
+            fontFamily: FontFamily.roboto,
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: FontSize.s16 * 1.5,
+          ),
         ),
       ),
     );
@@ -279,15 +286,20 @@ class _LoginViewState extends State<LoginView> {
   }
 
   void showAlertDialog(BuildContext context, {required String message}) {
+    if (!mounted) return;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Alert"),
         content: Text(message),
         actions: [
           TextButton(
             child: const Text("OK"),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              if (Navigator.canPop(dialogContext)) {
+                Navigator.pop(dialogContext);
+              }
+            },
           ),
         ],
       ),

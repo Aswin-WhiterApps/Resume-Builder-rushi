@@ -56,17 +56,39 @@ class IntroTabViewState extends State<IntroTabView> {
 
   Future<void> _loadIntroData() async {
     if (!mounted) return;
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
 
     final userId = MySingleton.userId;
     final resumeId = MySingleton.resumeId;
 
     if (userId == null || resumeId == null) {
-      if (mounted) setState(() { _isLoading = false; });
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+        });
       return;
     }
 
-    final resume = await _fireUser.getResume(userId: userId, resumeId: resumeId);
+    final resume =
+        await _fireUser.getResume(userId: userId, resumeId: resumeId);
+
+    File? imageFile;
+    if (resume != null &&
+        resume.intro != null &&
+        resume.intro!.imagePath != null &&
+        resume.intro!.imagePath!.isNotEmpty) {
+      // This assumes the path is a local file path for now.
+      // For a real app, you'd check if it's a URL and use NetworkImage.
+      final file = File(resume.intro!.imagePath!);
+      if (await file.exists()) {
+        imageFile = file;
+      } else {
+        debugPrint(
+            'Image file no longer exists, clearing path: ${resume.intro!.imagePath}');
+      }
+    }
 
     if (mounted) {
       setState(() {
@@ -74,11 +96,7 @@ class IntroTabViewState extends State<IntroTabView> {
           _currentIntro = resume.intro;
           firstNameController.text = _currentIntro!.firstName ?? '';
           lastNameController.text = _currentIntro!.lastName ?? '';
-          if (_currentIntro?.imagePath != null && _currentIntro!.imagePath!.isNotEmpty) {
-            // This assumes the path is a local file path for now.
-            // For a real app, you'd check if it's a URL and use NetworkImage.
-            _imageFile = File(_currentIntro!.imagePath!);
-          }
+          _imageFile = imageFile;
         }
         _isLoading = false;
       });
@@ -140,7 +158,8 @@ class IntroTabViewState extends State<IntroTabView> {
   }
 
   Future<void> _pickAndUploadImage() async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null) return;
 
     final userId = MySingleton.userId;
@@ -153,20 +172,19 @@ class IntroTabViewState extends State<IntroTabView> {
     final String imagePathForDb = pickedFile.path;
 
     await _fireUser.saveIntroImageForResume(
-        userId: userId,
-        resumeId: resumeId,
-        imagePath: imagePathForDb
-    );
+        userId: userId, resumeId: resumeId, imagePath: imagePathForDb);
 
-    if(mounted) {
+    if (mounted) {
       setState(() {
-        _imageFile = File(pickedFile.path); // Update the UI to show the new image
+        _imageFile =
+            File(pickedFile.path); // Update the UI to show the new image
         _currentIntro?.imagePath = imagePathForDb; // Update local state
       });
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Image Saved!"), duration: Duration(seconds: 1)),
+      const SnackBar(
+          content: Text("Image Saved!"), duration: Duration(seconds: 1)),
     );
   }
 
@@ -179,84 +197,116 @@ class IntroTabViewState extends State<IntroTabView> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Container(
-        height: MediaQuery.of(context).size.height,
-        color: ColorManager.tabBackground,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: AppPadding.p8, bottom: 20, top: AppPadding.p8),
-                  child: Text(
-                    AppStrings.chooseName,
-                    style: TextStyle(
-                        fontSize: FontSize.s20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: FontFamily.roboto),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: ColorManager.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                          blurRadius: 5,
-                          color: Colors.black38,
-                          offset: Offset.fromDirection(2, 2))
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSize.s8),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(AppSize.s16),
-                          child: InkWell(
-                            onTap: _pickAndUploadImage,
-                            child: CircleAvatar(
-                              radius: AppSize.s40,
-                              backgroundImage: _imageFile != null
-                                  ? FileImage(_imageFile!)
-                                  : const AssetImage(ImageAssets.userImage) as ImageProvider,
-                            ),
+              height: MediaQuery.of(context).size.height,
+              color: ColorManager.tabBackground,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: AppPadding.p8,
+                            bottom: 20,
+                            top: AppPadding.p8),
+                        child: Text(
+                          AppStrings.chooseName,
+                          style: TextStyle(
+                              fontSize: FontSize.s20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: FontFamily.roboto),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: ColorManager.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 5,
+                                color: Colors.black38,
+                                offset: Offset.fromDirection(2, 2))
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSize.s8),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(AppSize.s16),
+                                child: InkWell(
+                                  onTap: _pickAndUploadImage,
+                                  child: _imageFile != null
+                                      ? CircleAvatar(
+                                          radius: AppSize.s40,
+                                          backgroundColor: Colors.transparent,
+                                          child: ClipOval(
+                                            child: Image.file(
+                                              _imageFile!,
+                                              width: AppSize.s40 * 2,
+                                              height: AppSize.s40 * 2,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                debugPrint(
+                                                    'Error loading image file: $error');
+                                                return Image.asset(
+                                                  ImageAssets.userImage,
+                                                  width: AppSize.s40 * 2,
+                                                  height: AppSize.s40 * 2,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        )
+                                      : CircleAvatar(
+                                          radius: AppSize.s40,
+                                          backgroundColor: Colors.transparent,
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              ImageAssets.userImage,
+                                              width: AppSize.s40 * 2,
+                                              height: AppSize.s40 * 2,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                              _buildTextField(
+                                  controller: firstNameController,
+                                  hint: AppStrings.firstName),
+                              const SizedBox(height: AppSize.s8),
+                              _buildTextField(
+                                  controller: lastNameController,
+                                  hint: AppStrings.lastName),
+                              const Padding(
+                                padding: EdgeInsets.only(
+                                    left: AppPadding.p8,
+                                    right: AppPadding.p8,
+                                    bottom: AppPadding.p18,
+                                    top: AppPadding.p18),
+                                child: Text(
+                                  AppStrings.introScreenText,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: FontSize.s14,
+                                    fontFamily: FontFamily.roboto,
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                        _buildTextField(
-                            controller: firstNameController,
-                            hint: AppStrings.firstName),
-                        const SizedBox(height: AppSize.s8),
-                        _buildTextField(
-                            controller: lastNameController,
-                            hint: AppStrings.lastName),
-                        const Padding(
-                          padding: EdgeInsets.only(
-                              left: AppPadding.p8,
-                              right: AppPadding.p8,
-                              bottom: AppPadding.p18,
-                              top: AppPadding.p18),
-                          child: Text(
-                            AppStrings.introScreenText,
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: FontSize.s14,
-                              fontFamily: FontFamily.roboto,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -280,8 +330,7 @@ class IntroTabViewState extends State<IntroTabView> {
           borderSide: BorderSide(color: Colors.grey, width: 1.5),
         ),
         focusedBorder: const UnderlineInputBorder(
-          borderSide:
-          BorderSide(color: Colors.blueAccent, width: 2),
+          borderSide: BorderSide(color: Colors.blueAccent, width: 2),
         ),
         border: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.grey),

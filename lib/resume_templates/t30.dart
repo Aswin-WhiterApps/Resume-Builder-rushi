@@ -330,7 +330,7 @@ class Template30 {
         // right-side only (swapped from left)
         rightColumnItems.add(
           Padding(
-            padding: EdgeInsets.fromLTRB(80, 10, 10, 5), // Reduced padding
+            padding: EdgeInsets.fromLTRB(10, 10, 10, 5), // Reduced padding
             child: _buildRotatedSectionFromModel(sectionData[i]),
           ),
         );
@@ -377,7 +377,7 @@ class Template30 {
     if (workData.isNotEmpty) {
       rightColumnItems.add(
         Padding(
-          padding: EdgeInsets.fromLTRB(80, 10, 10, 5), // Reduced padding
+          padding: EdgeInsets.fromLTRB(10, 10, 10, 5), // Reduced padding
           child: _buildWorkSection(),
         ),
       );
@@ -409,7 +409,7 @@ class Template30 {
               children: leftColumnItems,
             ),
           ),
-          SizedBox(width: 15),
+          SizedBox(width: 5),
           // Right Column
           Expanded(
             flex: 3,

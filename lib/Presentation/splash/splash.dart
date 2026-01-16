@@ -45,9 +45,25 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
         listener: (context, state) async {
           await Future.delayed(const Duration(seconds: 3));
           if (state is AuthAuthenticated) {
-            Navigator.pushReplacementNamed(context, Routes.homescreen);
+            if (Navigator.canPop(context)) {
+              Navigator.pushReplacementNamed(context, Routes.homescreen);
+            } else {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.homescreen,
+                (route) => false,
+              );
+            }
           } else if (state is AuthUnauthenticated) {
-            Navigator.pushReplacementNamed(context, Routes.loginPage);
+            if (Navigator.canPop(context)) {
+              Navigator.pushReplacementNamed(context, Routes.loginPage);
+            } else {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.loginPage,
+                (route) => false,
+              );
+            }
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Auth Error: ${state.message}")),
@@ -73,7 +89,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                 ),
                 child: Column(
                   children: [
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 60),
                     Column(
                       children: [
                         const SizedBox(height: 20),
@@ -114,42 +130,53 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 30),
                         FadeTransition(
                           opacity: _animationController,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: Image.asset(
-                              ImageAssets.appLogo,
-                              width: 200,
-                              height: 200,
+                            child: Semantics(
+                              label: 'Resume Builder Application Logo',
+                              image: true,
+                              child: Image.asset(
+                                ImageAssets.appLogo,
+                                width: 200,
+                                height: 200,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 40),
                     Column(
                       children: [
-                        FadeTransition(
-                          opacity: _animationController,
-                          child: Image.asset(
-                            ImageAssets.Whiterapps_logo,
-                            width: 50,
-                            height: 50,
+                        Semantics(
+                          label: 'Whiterapps Logo',
+                          image: true,
+                          child: FadeTransition(
+                            opacity: _animationController,
+                            child: Image.asset(
+                              ImageAssets.Whiterapps_logo,
+                              width: 50,
+                              height: 50,
+                            ),
                           ),
                         ),
                         FadeTransition(
                           opacity: _animationController,
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 30),
-                            child: Text(
-                              AppStrings.splashStatement,
-                              style: TextStyle(
-                                color: ColorManager.primary,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w300,
-                                fontFamily: FontFamily.emblema,
+                            child: Semantics(
+                              header: true,
+                              child: Text(
+                                AppStrings.splashStatement,
+                                style: TextStyle(
+                                  color: ColorManager.primary,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w300,
+                                  fontFamily: FontFamily.emblema,
+                                ),
                               ),
                             ),
                           ),

@@ -10,7 +10,8 @@ void main() {
     testWidgets('Complete resume building flow', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Wait for home screen
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
       
       // Find and tap Create Resume button
@@ -47,8 +48,10 @@ void main() {
     testWidgets('Contact tab functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -96,8 +99,10 @@ void main() {
     testWidgets('Work tab functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -137,8 +142,10 @@ void main() {
     testWidgets('Education tab functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -177,8 +184,10 @@ void main() {
     testWidgets('Summary tab functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -215,8 +224,10 @@ void main() {
     testWidgets('Templates tab functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -253,8 +264,10 @@ void main() {
     testWidgets('Download tab functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -292,8 +305,10 @@ void main() {
     testWidgets('Tab navigation functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
@@ -318,8 +333,10 @@ void main() {
     testWidgets('Save and continue functionality', (WidgetTester tester) async {
       await IntegrationTestConfig.initApp();
       
-      // Navigate to resume builder
+      // Initialize app with proper widget setup
+      await tester.pumpWidget(IntegrationTestConfig.createTestApp());
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);
+      
       final createResumeButton = find.text('Create Resume');
       await IntegrationTestConfig.safeTap(tester, createResumeButton);
       await tester.pumpAndSettle(IntegrationTestConfig.defaultTimeout);

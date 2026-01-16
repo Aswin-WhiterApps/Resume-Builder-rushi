@@ -298,22 +298,36 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
     try {
       print('Download PDF clicked - Saving PDF...');
 
-      // Get Downloads directory
-      final directory = await getExternalStorageDirectory() ??
-          await getApplicationDocumentsDirectory();
-      final downloadsDir = Directory('${directory.path}/Downloads');
+      // getExternalStorageDirectory is only supported on Android.
+      // For iOS, we use getApplicationDocumentsDirectory.
+      final directory = Platform.isAndroid
+          ? await getExternalStorageDirectory()
+          : await getApplicationDocumentsDirectory();
 
-      if (!await downloadsDir.exists()) {
-        await downloadsDir.create(recursive: true);
+      if (directory == null) {
+        throw Exception("Could not find storage directory");
+      }
+
+      // On Android, we might want to put it in a Downloads subfolder.
+      // On iOS, we save it directly to the app's documents directory.
+      String targetPath;
+      if (Platform.isAndroid) {
+        final downloadsDir = Directory('${directory.path}/Downloads');
+        if (!await downloadsDir.exists()) {
+          await downloadsDir.create(recursive: true);
+        }
+        targetPath = downloadsDir.path;
+      } else {
+        targetPath = directory.path;
       }
 
       final fileName = 'Resume_${DateTime.now().millisecondsSinceEpoch}.pdf';
-      final newPath = '${downloadsDir.path}/$fileName';
+      final newPath = '$targetPath/$fileName';
       final newFile = await _generatedPdfFile!.copy(newPath);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('PDF saved to Downloads folder'),
+          content: Text('PDF saved successfully'),
           backgroundColor: Colors.green,
         ),
       );
@@ -723,7 +737,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
                             child: ElevatedButton.icon(
                               onPressed: _downloadPDF,
                               icon: const Icon(Icons.download),
-                              label: const Text('Download PDF'),
+                              label: const Text('View PDF'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green[600],
                                 foregroundColor: Colors.white,

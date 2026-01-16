@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,7 +36,9 @@ class ContactsTabViewState extends State<ContactsTabView> {
     final userId = MySingleton.userId;
     final resumeId = MySingleton.resumeId;
     if (userId != null && resumeId != null) {
-      context.read<ContactBloc>().add(LoadContactEvent(userId: userId, resumeId: resumeId));
+      context
+          .read<ContactBloc>()
+          .add(LoadContactEvent(userId: userId, resumeId: resumeId));
     }
 
     _emailController.addListener(_onTextChanged);
@@ -90,7 +91,9 @@ class ContactsTabViewState extends State<ContactsTabView> {
         userId: userId, resumeId: resumeId, contactModel: contact));
 
     if (showSnackbar && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Contact Info Saved!"), duration: Duration(seconds: 1)));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Contact Info Saved!"),
+          duration: Duration(seconds: 1)));
     }
   }
 
@@ -107,10 +110,12 @@ class ContactsTabViewState extends State<ContactsTabView> {
           if (_phoneController.text != (state.contact.phone ?? '')) {
             _phoneController.text = state.contact.phone ?? '';
           }
-          if (_socialMedia1Controller.text != (state.contact.socialMediaUrl1 ?? '')) {
+          if (_socialMedia1Controller.text !=
+              (state.contact.socialMediaUrl1 ?? '')) {
             _socialMedia1Controller.text = state.contact.socialMediaUrl1 ?? '';
           }
-          if (_personnelWebController.text != (state.contact.personnelWeb ?? '')) {
+          if (_personnelWebController.text !=
+              (state.contact.personnelWeb ?? '')) {
             _personnelWebController.text = state.contact.personnelWeb ?? '';
           }
           if (_addr1Controller.text != (state.contact.addr1 ?? '')) {
@@ -120,7 +125,8 @@ class ContactsTabViewState extends State<ContactsTabView> {
             _addr2Controller.text = state.contact.addr2 ?? '';
           }
         } else if (state is ContactError) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       child: Scaffold(
@@ -135,7 +141,8 @@ class ContactsTabViewState extends State<ContactsTabView> {
                 padding: const EdgeInsets.all(AppPadding.p16),
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: AppPadding.p20),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: AppPadding.p20),
                     child: Text(
                       AppStrings.contactsHeader,
                       style: TextStyle(
@@ -173,17 +180,37 @@ class ContactsTabViewState extends State<ContactsTabView> {
         key: _formKey,
         child: Column(
           children: [
-            _contactField(controller: _emailController, label: AppStrings.emailAddress, hint: AppStrings.emailHint, validator: _emailValidator, keyboardType: TextInputType.emailAddress),
-            _contactField(controller: _phoneController, label: AppStrings.phoneNumber, hint: AppStrings.phoneHint, validator: _phoneValidator, keyboardType: TextInputType.phone),
-            _contactField(controller: _socialMedia1Controller, label: AppStrings.socialMediaURL, hint: AppStrings.socialMediaHint),
-            _contactField(controller: _personnelWebController, label: AppStrings.personnelWeb, hint: AppStrings.personnelWebHint),
-            _contactField(controller: _addr1Controller, label: AppStrings.whtAddress, hint: AppStrings.addr1Hint),
-            _contactField(controller: _addr2Controller, hint: AppStrings.addr2Hint),
+            _contactField(
+                controller: _emailController,
+                label: AppStrings.emailAddress,
+                hint: AppStrings.emailHint,
+                validator: _emailValidator,
+                keyboardType: TextInputType.emailAddress),
+            _contactField(
+                controller: _phoneController,
+                label: AppStrings.phoneNumber,
+                hint: AppStrings.phoneHint,
+                validator: _phoneValidator,
+                keyboardType: TextInputType.phone),
+            _contactField(
+                controller: _socialMedia1Controller,
+                label: AppStrings.socialMediaURL,
+                hint: AppStrings.socialMediaHint),
+            _contactField(
+                controller: _personnelWebController,
+                label: AppStrings.personnelWeb,
+                hint: AppStrings.personnelWebHint),
+            _contactField(
+                controller: _addr1Controller,
+                label: AppStrings.whtAddress,
+                hint: AppStrings.addr1Hint),
+            _contactField(
+                controller: _addr2Controller, hint: AppStrings.addr2Hint),
             const Padding(
               padding: EdgeInsets.only(top: AppPadding.p18),
               child: Text(
                 AppStrings.contactScreenText,
-                style: TextStyle(color: Colors.grey, fontSize: FontSize.s12),
+                style: TextStyle(color: Colors.grey, fontSize: FontSize.s16),
               ),
             ),
           ],

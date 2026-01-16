@@ -152,7 +152,7 @@ class Template3 {
       }
     }
 
-  if (signatureImage != null) {
+    if (signatureImage != null) {
       rightColumnWidgets.add(
         Container(
           alignment: Alignment.centerRight,
@@ -213,48 +213,25 @@ class Template3 {
               ),
             ),
             SizedBox(height: 10),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              runSpacing: 4,
-              children: [
-                if (contactData?.email?.isNotEmpty ?? false)
-                  Text(
+            Center(
+              child: Text(
+                [
+                  if (contactData?.email?.isNotEmpty ?? false)
                     contactData!.email!,
-                    style: TextStyle(fontSize: 7, color: normalColor),
-                  ),
-                if (contactData?.phone?.isNotEmpty ?? false)
-                  Text(
+                  if (contactData?.phone?.isNotEmpty ?? false)
                     contactData!.phone!,
-                    style: TextStyle(fontSize: 7, color: normalColor),
-                  ),
-                if (contactData?.addr1?.isNotEmpty ?? false)
-                  Text(
+                  if (contactData?.addr1?.isNotEmpty ?? false)
                     contactData!.addr1!,
-                    style: TextStyle(fontSize: 7, color: normalColor),
-                  ),
-                if (contactData?.addr2?.isNotEmpty ?? false)
-                  Text(
+                  if (contactData?.addr2?.isNotEmpty ?? false)
                     contactData!.addr2!,
-                    style: TextStyle(fontSize: 7, color: normalColor),
-                  ),
-                if (contactData?.socialMediaUrl1?.isNotEmpty ?? false)
-                  Text(
+                  if (contactData?.socialMediaUrl1?.isNotEmpty ?? false)
                     contactData!.socialMediaUrl1!,
-                    style: TextStyle(
-                      fontSize: 7,
-                      color: PdfColors.blue,
-                    ),
-                  ),
-                if (contactData?.socialMediaUrl2?.isNotEmpty ?? false)
-                  Text(
+                  if (contactData?.socialMediaUrl2?.isNotEmpty ?? false)
                     contactData!.socialMediaUrl2!,
-                    style: TextStyle(
-                      fontSize: 7,
-                      color: PdfColors.blue,
-                    ),
-                  ),
-              ],
+                ].join(' | '),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 7, color: normalColor),
+              ),
             ),
             SizedBox(height: 20),
             Partitions(

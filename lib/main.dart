@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,45 +18,64 @@ import 'blocs/contact_tab/contact_bloc.dart';
 import 'blocs/summary/summary_bloc.dart';
 
 Future<void> main() async {
+  // Initialize Flutter bindings at the very beginning
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set this BEFORE other INITIALIZATIONS
+  BindingBase.debugZoneErrorsAreFatal = false;
+
+  // Load environment variables
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     debugPrint('dotenv load skipped or failed: $e');
   }
 
-  // Initialize AdMob with automatic test/production switching
+  // Initialize AdMob
   await AdMobService.initialize();
 
+  // Set preferred orientations
   try {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
   } catch (e) {
-    print(
-        'SystemChrome orientation setting failed (expected in some test environments): $e');
+    debugPrint('SystemChrome orientation setting failed: $e');
   }
-  // Initialize Firebase gracefully
+
+  // Initialize Firebase and Crashlytics
   try {
     if (const bool.fromEnvironment('FLUTTER_TEST_ENV') ||
         Platform.environment.containsKey('FLUTTER_TEST')) {
-      print('Firebase initialization skipped: running in test environment');
+      debugPrint(
+          'Firebase initialization skipped: running in test environment');
     } else {
       await Firebase.initializeApp();
+
+      // Initialize Crashlytics
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+      // Catch async errors using modern PlatformDispatcher
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
     }
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    debugPrint('Firebase initialization failed: $e');
   }
 
   // Initialize AI services
   try {
     await AIServiceManager.instance.initialize();
-    print('AI services initialized successfully');
+    debugPrint('AI services initialized successfully');
   } catch (e) {
-    print('AI services initialization failed: $e');
+    debugPrint('AI services initialization failed: $e');
   }
 
+  // Run the app directly
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider<AuthBloc>(

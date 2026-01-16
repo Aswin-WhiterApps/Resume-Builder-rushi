@@ -155,7 +155,7 @@ class CoverLetterTabViewState extends State<CoverLetterTabView> {
           boxShadow: [BoxShadow(blurRadius: 5, color: Colors.black38, offset: Offset.fromDirection(2, 2))],
         ),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

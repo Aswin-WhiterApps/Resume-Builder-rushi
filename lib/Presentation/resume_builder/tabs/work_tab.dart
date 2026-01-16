@@ -35,7 +35,6 @@ class WorkTabViewState extends State<WorkTabView> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-
       builder: (ctx) => BlocProvider.value(
         value: context.read<WorkBloc>(),
         child: WorkForm(
@@ -56,17 +55,18 @@ class WorkTabViewState extends State<WorkTabView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+              child:
+                  const Text("Cancel", style: TextStyle(color: Colors.black)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
                 context.read<WorkBloc>().add(
-                  DeleteWorkplace(
-                      id: MySingleton.resumeId!,
-                      wid: work.id!,
-                      userId: MySingleton.userId!),
-                );
+                      DeleteWorkplace(
+                          id: MySingleton.resumeId!,
+                          wid: work.id!,
+                          userId: MySingleton.userId!),
+                    );
               },
               child: const Text("DELETE", style: TextStyle(color: Colors.red)),
             ),
@@ -105,7 +105,7 @@ class WorkTabViewState extends State<WorkTabView> {
               else
                 Padding(
                   padding: const EdgeInsets.only(
-                      bottom: 80, left: 16, right: 16, top: 26),
+                      bottom: 20, left: 16, right: 16, top: 25),
                   child: ListView.builder(
                     padding: const EdgeInsets.only(bottom: 150),
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -132,8 +132,8 @@ class WorkTabViewState extends State<WorkTabView> {
                       final String details = (work.details ?? '').trim();
 
                       return Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: AppPadding.p8),
+                        margin:
+                            const EdgeInsets.symmetric(vertical: AppPadding.p8),
                         padding: const EdgeInsets.all(AppPadding.p12),
                         decoration: BoxDecoration(
                           color: ColorManager.white,
@@ -217,28 +217,24 @@ class WorkTabViewState extends State<WorkTabView> {
                                   ),
                                   const SizedBox(width: FontSize.s35),
                                   GestureDetector(
-                                    onTap: () =>
-                                        _showDeleteConfirmationDialog(
-                                            context, work),
+                                    onTap: () => _showDeleteConfirmationDialog(
+                                        context, work),
                                     child: const Text(
                                       AppStrings.delete,
                                       style: TextStyle(
-                                        color: Colors
-                                            .red,
+                                        color: Colors.red,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
                                   const Spacer(),
                                   IconButton(
-                                      onPressed:
-                                      index == state.works.length - 1
+                                      onPressed: index == state.works.length - 1
                                           ? null
                                           : () => _moveDown(index),
                                       icon: Icon(
                                         Icons.arrow_downward_outlined,
-                                        color:
-                                        index == state.works.length - 1
+                                        color: index == state.works.length - 1
                                             ? Colors.grey
                                             : ColorManager.secondary,
                                       )),
@@ -264,7 +260,7 @@ class WorkTabViewState extends State<WorkTabView> {
                 ),
               if (state.works.isNotEmpty)
                 Positioned(
-                  bottom: 120,
+                  bottom: 10,
                   left: 0,
                   right: 0,
                   child: Align(
@@ -305,7 +301,6 @@ class WorkTabViewState extends State<WorkTabView> {
     );
   }
 }
-
 
 class WorkForm extends StatefulWidget {
   final WorkModel? work;
@@ -363,9 +358,8 @@ class _WorkFormState extends State<WorkForm> {
 
         if (fromParts.length == 2 && toParts.length == 2) {
           final fromDate =
-          DateTime(int.parse(fromParts[1]), int.parse(fromParts[0]));
-          final toDate =
-          DateTime(int.parse(toParts[1]), int.parse(toParts[0]));
+              DateTime(int.parse(fromParts[1]), int.parse(fromParts[0]));
+          final toDate = DateTime(int.parse(toParts[1]), int.parse(toParts[0]));
 
           if (toDate.isBefore(fromDate)) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -424,11 +418,11 @@ class _WorkFormState extends State<WorkForm> {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: isRequired
               ? (value) {
-            if (value == null || value.trim().isEmpty) {
-              return '$question is required';
-            }
-            return null;
-          }
+                  if (value == null || value.trim().isEmpty) {
+                    return '$question is required';
+                  }
+                  return null;
+                }
               : null,
           style: const TextStyle(
             color: Colors.black,
@@ -439,7 +433,7 @@ class _WorkFormState extends State<WorkForm> {
             hintText: "  $hint",
             hintStyle: const TextStyle(
               color: Colors.grey,
-              fontSize: FontSize.s20,
+              fontSize: FontSize.s12,
               fontWeight: FontWeight.normal,
             ),
             enabledBorder: const UnderlineInputBorder(
@@ -458,10 +452,10 @@ class _WorkFormState extends State<WorkForm> {
   }
 
   Future<void> _selectMonthYear(
-      BuildContext context,
-      TextEditingController controller, {
-        DateTime? firstDate,
-      }) async {
+    BuildContext context,
+    TextEditingController controller, {
+    DateTime? firstDate,
+  }) async {
     DateTime selectedDate = DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -498,7 +492,7 @@ class _WorkFormState extends State<WorkForm> {
   Widget build(BuildContext context) {
     return Padding(
       padding:
-      EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -557,16 +551,15 @@ class _WorkFormState extends State<WorkForm> {
                       const SizedBox(height: AppSize.s20),
                       _getInputTextField(
                         textEditingController: _companyWorkDetailsController,
-                        question: "WORK DETAILS: ",
-                        hint:
-                        "Describe your responsibilities, achievements...",
+                        question: "Work Details: ",
+                        hint: "Describe your responsibilities, achievements...",
                         isRequired: true,
                         maxLines: 4,
                       ),
                       const SizedBox(height: AppSize.s20),
                       GestureDetector(
-                        onTap: () =>
-                            _selectMonthYear(context, _companyPosFromController),
+                        onTap: () => _selectMonthYear(
+                            context, _companyPosFromController),
                         child: AbsorbPointer(
                           child: _getInputTextField(
                             textEditingController: _companyPosFromController,
@@ -581,25 +574,25 @@ class _WorkFormState extends State<WorkForm> {
                         onTap: _presentWork
                             ? null
                             : () {
-                          final fromDateText =
-                              _companyPosFromController.text;
-                          DateTime? fromDate;
-                          if (fromDateText.isNotEmpty) {
-                            final parts = fromDateText.split('/');
-                            if (parts.length == 2) {
-                              final month = int.tryParse(parts[0]);
-                              final year = int.tryParse(parts[1]);
-                              if (month != null && year != null) {
-                                fromDate = DateTime(year, month);
-                              }
-                            }
-                          }
-                          _selectMonthYear(
-                            context,
-                            _companyPosUntilController,
-                            firstDate: fromDate,
-                          );
-                        },
+                                final fromDateText =
+                                    _companyPosFromController.text;
+                                DateTime? fromDate;
+                                if (fromDateText.isNotEmpty) {
+                                  final parts = fromDateText.split('/');
+                                  if (parts.length == 2) {
+                                    final month = int.tryParse(parts[0]);
+                                    final year = int.tryParse(parts[1]);
+                                    if (month != null && year != null) {
+                                      fromDate = DateTime(year, month);
+                                    }
+                                  }
+                                }
+                                _selectMonthYear(
+                                  context,
+                                  _companyPosUntilController,
+                                  firstDate: fromDate,
+                                );
+                              },
                         child: AbsorbPointer(
                           child: _getInputTextField(
                             textEditingController: _companyPosUntilController,
@@ -615,10 +608,12 @@ class _WorkFormState extends State<WorkForm> {
                           Switch(
                             value: _presentWork,
                             activeColor: Colors.lightBlue,
-                      activeThumbImage: AssetImage(ImageAssets.thumbActiveIc),
-                      activeTrackColor: Colors.lightBlueAccent.withOpacity(0.3),
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: ColorManager.tabBackground,
+                            activeThumbImage:
+                                AssetImage(ImageAssets.thumbActiveIc),
+                            activeTrackColor:
+                                Colors.lightBlueAccent.withOpacity(0.3),
+                            inactiveThumbColor: Colors.white,
+                            inactiveTrackColor: ColorManager.tabBackground,
                             onChanged: (bool value) {
                               setState(() {
                                 _presentWork = value;

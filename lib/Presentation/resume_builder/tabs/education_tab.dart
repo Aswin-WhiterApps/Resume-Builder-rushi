@@ -670,35 +670,34 @@ class EducationTabViewState extends State<EducationTabView> {
     final userId = MySingleton.userId!;
     List<EducationModel> list =
         await _fireUser.getEducations(userId: userId, resumeId: id);
-    //List<EducationModel?>? list = await DbHelper.instance.getAllEducations(id);
 
-    setState(() {
-      _educationList = (list
-          .where((education) => education != null)
-          .cast<EducationModel>()
-          .toList());
-      // Sort by sortOrder to ensure correct order
-      _educationList
-          .sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
+    if (mounted) {
+      setState(() {
+        _educationList = (list
+            .where((education) => education != null)
+            .cast<EducationModel>()
+            .toList());
+        // Sort by sortOrder to ensure correct order
+        _educationList
+            .sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
 
-      // Ensure all items have unique sequential sortOrder values
-      // This guarantees that swapping will work correctly
-      for (int i = 0; i < _educationList.length; i++) {
-        final currentItem = _educationList[i];
-        // Assign sequential sortOrder values based on current position
-        if (currentItem.sortOrder != i) {
-          _educationList[i] = EducationModel(
-            id: currentItem.id,
-            eid: currentItem.eid,
-            schoolName: currentItem.schoolName,
-            dateFrom: currentItem.dateFrom,
-            dateTo: currentItem.dateTo,
-            present: currentItem.present,
-            sortOrder: i,
-          );
+        // Ensure all items have unique sequential sortOrder values
+        for (int i = 0; i < _educationList.length; i++) {
+          final currentItem = _educationList[i];
+          if (currentItem.sortOrder != i) {
+            _educationList[i] = EducationModel(
+              id: currentItem.id,
+              eid: currentItem.eid,
+              schoolName: currentItem.schoolName,
+              dateFrom: currentItem.dateFrom,
+              dateTo: currentItem.dateTo,
+              present: currentItem.present,
+              sortOrder: i,
+            );
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   void _showEducationForm({EducationModel? education}) {
@@ -853,7 +852,7 @@ class EducationTabViewState extends State<EducationTabView> {
           else
             Padding(
               padding:
-                  EdgeInsets.only(bottom: 80, left: 16, right: 16, top: 26),
+                  EdgeInsets.only(bottom: 10, left: 16, right: 16, top: 25),
               child: ListView.builder(
                 padding: EdgeInsets.only(
                   bottom:
@@ -876,8 +875,8 @@ class EducationTabViewState extends State<EducationTabView> {
                   ].join(' - ');
 
                   return Container(
-                    margin: EdgeInsets.symmetric(vertical: AppPadding.p8),
-                    padding: EdgeInsets.all(AppPadding.p12),
+                    margin: EdgeInsets.symmetric(vertical: AppPadding.p20),
+                    padding: EdgeInsets.all(AppPadding.p20),
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       color: ColorManager.white,
@@ -890,8 +889,7 @@ class EducationTabViewState extends State<EducationTabView> {
                       ],
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: AppPadding.p12, top: 7, bottom: AppPadding.p12),
+                      padding: const EdgeInsets.all(AppPadding.p20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -907,7 +905,7 @@ class EducationTabViewState extends State<EducationTabView> {
                           if (dateRange.isNotEmpty)
                             Padding(
                               padding:
-                                  const EdgeInsets.only(top: AppPadding.p8),
+                                  const EdgeInsets.only(top: AppPadding.p20),
                               child: Text(
                                 dateRange,
                                 style: TextStyle(
@@ -978,7 +976,7 @@ class EducationTabViewState extends State<EducationTabView> {
             ),
           if (_educationList.isNotEmpty)
             Positioned(
-              bottom: 120,
+              bottom: 10,
               left: 0,
               right: 0,
               child: Align(
@@ -1015,7 +1013,10 @@ class EducationTabViewState extends State<EducationTabView> {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Padding(
               padding: EdgeInsets.only(
-                  left: AppSize.s16, right: AppSize.s16, bottom: AppSize.s16),
+                  left: AppSize.s16,
+                  right: AppSize.s16,
+                  bottom: AppSize.s16,
+                  top: 46),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -1034,11 +1035,7 @@ class EducationTabViewState extends State<EducationTabView> {
                         ],
                       ),
                       child: Padding(
-                        padding: EdgeInsets.only(
-                          left: AppSize.s8,
-                          right: AppSize.s8,
-                          top: AppPadding.p30,
-                        ),
+                        padding: EdgeInsets.all(AppPadding.p20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1048,7 +1045,7 @@ class EducationTabViewState extends State<EducationTabView> {
                                 question: AppStrings.whtSchool,
                                 hint: AppStrings.whtSchoolHint,
                                 isRequired: true),
-                            SizedBox(height: AppSize.s20),
+                            SizedBox(height: AppSize.s12),
                             GestureDetector(
                               onTap: () => _selectMonthYear(
                                 context,
@@ -1187,8 +1184,10 @@ class EducationTabViewState extends State<EducationTabView> {
                                       MySingleton.schoolNameController.clear();
                                       MySingleton.schoolFromController.clear();
                                       MySingleton.schoolToController.clear();
-                                      setState(
-                                          () => MySingleton.presentEdu = false);
+                                      if (mounted) {
+                                        setState(() =>
+                                            MySingleton.presentEdu = false);
+                                      }
                                     }
                                   },
                                   child: Text(
@@ -1254,7 +1253,7 @@ class EducationTabViewState extends State<EducationTabView> {
             hintText: "  $hint",
             hintStyle: TextStyle(
                 color: Colors.grey,
-                fontSize: FontSize.s20,
+                fontSize: FontSize.s12,
                 fontWeight: FontWeight.normal),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
@@ -1667,7 +1666,7 @@ class _EducationFormState extends State<EducationForm> {
               hintText: label,
               hintStyle: TextStyle(
                 color: Colors.grey,
-                fontSize: FontSize.s20,
+                fontSize: FontSize.s12,
                 fontWeight: FontWeight.normal,
               ),
               enabledBorder: UnderlineInputBorder(
@@ -1782,7 +1781,7 @@ class _EducationFormState extends State<EducationForm> {
                 hintText: label,
                 hintStyle: TextStyle(
                   color: Colors.grey,
-                  fontSize: FontSize.s20,
+                  fontSize: FontSize.s12,
                   fontWeight: FontWeight.normal,
                 ),
                 enabledBorder: UnderlineInputBorder(

@@ -5,6 +5,7 @@ import '../resources/color_manager.dart';
 import '../resources/font_manager.dart';
 import '../resources/route_manager.dart';
 import '../resources/values_manager.dart';
+
 class Promo3View extends StatelessWidget {
   const Promo3View({super.key});
 
@@ -16,13 +17,15 @@ class Promo3View extends StatelessWidget {
       ),
     );
   }
-  void _getSubscription(BuildContext context){
+
+  void _getSubscription(BuildContext context) {
     Navigator.of(context).pushReplacementNamed(Routes.subscriptionPage);
   }
-  Widget _getPromo3(BuildContext context){
+
+  Widget _getPromo3(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: AppPadding.p20),
-      height: MediaQuery.of(context).size.height*0.75 ,
+      // height: MediaQuery.of(context).size.height*0.75 ,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -32,7 +35,8 @@ class Promo3View extends StatelessWidget {
             decoration: BoxDecoration(
               color: ColorManager.white,
               image: DecorationImage(
-                  colorFilter: ColorFilter.mode( ColorManager.white.withOpacity(0.7), BlendMode.hardLight),
+                  colorFilter: ColorFilter.mode(
+                      ColorManager.white.withOpacity(0.7), BlendMode.hardLight),
                   image: AssetImage(
                     ImageAssets.promoBg3,
                   ),
@@ -56,8 +60,6 @@ class Promo3View extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-
-
                   // SizedBox(
                   //   height: 20,
                   // ),
@@ -74,30 +76,35 @@ class Promo3View extends StatelessWidget {
                                 height: 20,
                               ),
                               Center(
-                                child:
-                                Stack(children: [
-                                  Text(
-                                    "Upagrade to Premium",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      // fontFamily: FontFamily.poppins,
-                                      // color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: FontSize.s20,letterSpacing: 3,
-                                        foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 10..color = ColorManager.promo1BgColor
+                                child: Stack(
+                                  children: [
+                                    Text(
+                                      "Upagrade to Premium",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          // fontFamily: FontFamily.poppins,
+                                          // color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: FontSize.s20,
+                                          letterSpacing: 3,
+                                          foreground: Paint()
+                                            ..style = PaintingStyle.stroke
+                                            ..strokeWidth = 10
+                                            ..color =
+                                                ColorManager.promo1BgColor),
                                     ),
-                                  ),
-                                  Text(
-                                    "Upagrade to Premium",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      // fontFamily: FontFamily.poppins,
-                                        color: ColorManager.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: FontSize.s20,letterSpacing: 3
+                                    Text(
+                                      "Upagrade to Premium",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          // fontFamily: FontFamily.poppins,
+                                          color: ColorManager.white,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: FontSize.s20,
+                                          letterSpacing: 3),
                                     ),
-                                  ),
-                                ],),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -111,10 +118,12 @@ class Promo3View extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => _getSubscription(context),
                     style: ElevatedButton.styleFrom(
-
-                        shape: StadiumBorder(side: BorderSide(color: ColorManager.promo1BgColor,strokeAlign: BorderSide.strokeAlignCenter,width: 3)),
+                        shape: StadiumBorder(
+                            side: BorderSide(
+                                color: ColorManager.promo1BgColor,
+                                strokeAlign: BorderSide.strokeAlignCenter,
+                                width: 3)),
                         backgroundColor: Colors.white70),
-
                     child: Text(
                       "Unloack Now !",
                       textScaleFactor: 1.5,
@@ -127,10 +136,12 @@ class Promo3View extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => _getSubscription(context),
                     style: ElevatedButton.styleFrom(
-
-                        shape: StadiumBorder(side: BorderSide(color: ColorManager.promo1BgColor,strokeAlign: BorderSide.strokeAlignCenter,width: 3)),
+                        shape: StadiumBorder(
+                            side: BorderSide(
+                                color: ColorManager.promo1BgColor,
+                                strokeAlign: BorderSide.strokeAlignCenter,
+                                width: 3)),
                         backgroundColor: Colors.white70),
-
                     child: Text(
                       "Watch Ad",
                       textScaleFactor: 1.5,
@@ -147,7 +158,9 @@ class Promo3View extends StatelessWidget {
                     "Your Next-Level Resume Starts Here",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: ColorManager.promo2buttonColor, fontWeight: FontWeight.w600,letterSpacing: 1),
+                        color: ColorManager.promo2buttonColor,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1),
                   ),
                   SizedBox(
                     height: 20,

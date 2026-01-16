@@ -1,78 +1,55 @@
-
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'adunits.dart';
 
-class CreateAd{
+class CreateAd {
   static bool bannerAdLoaded = false;
-  static BannerAd homescreenBanner =  BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdUnitId.homeScreenBanner,
-      listener: BannerAdListener(
-          onAdLoaded: (ad){
-            print("Homescreen Banner Ad Has been Loaded");
-            bannerAdLoaded=true;
-          },
-          onAdFailedToLoad: (ad,error){
-            ad.dispose();
-            print("Homescreen Banner Ad Has Failed To Load because $error");
-          }
-      ),
-      request: AdRequest()  )..load();
 
-  static BannerAd resumebuilderBanner =  BannerAd(
+  static BannerAd resumebuilderBanner = BannerAd(
       size: AdSize.banner,
       adUnitId: AdUnitId.resumeBuilderBanner,
-      listener: BannerAdListener(
-          onAdLoaded: (ad){
-            print("resume builder Banner Ad Has been Loaded");
-          },
-          onAdFailedToLoad: (ad,error){
-            ad.dispose();
-            print("resume builder Banner Ad Has Failed To Load because $error");
-
-          }
-      ),
-      request: AdRequest() );
+      listener: BannerAdListener(onAdLoaded: (ad) {
+        print("resume builder Banner Ad Has been Loaded");
+      }, onAdFailedToLoad: (ad, error) {
+        ad.dispose();
+        print("resume builder Banner Ad Has Failed To Load because $error");
+      }),
+      request: AdRequest());
 
   // late InterstitialAd interstitialAd;
   // bool isInterstitialAdLoaded = false;
-  Future<void> loadResumeBuilderAd()  async {
-     await InterstitialAd.load(
-      adUnitId: AdUnitId.resumeBuilderInterstitialAd,
-      request: AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad){
+  Future<void> loadResumeBuilderAd() async {
+    await InterstitialAd.load(
+        adUnitId: AdUnitId.resumeBuilderInterstitialAd,
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
             ad.show();
             print("resume builder Interstitial Ad Has been Loaded");
           },
-    onAdFailedToLoad: (error){
-
-    // ad.dispose();
-    print("resume builder Interstitial Ad Has Failed To Load because $error");
-
-    },
-    ));
-
+          onAdFailedToLoad: (error) {
+            // ad.dispose();
+            print(
+                "resume builder Interstitial Ad Has Failed To Load because $error");
+          },
+        ));
   }
 
-  Future<void> loadTemplateTabAd()  async {
+  Future<void> loadTemplateTabAd() async {
     await InterstitialAd.load(
         adUnitId: AdUnitId.templatetabInterstitialAd,
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad){
+          onAdLoaded: (ad) {
             ad.show();
             print("resume builder Interstitial Ad Has been Loaded");
           },
-          onAdFailedToLoad: (error){
-
+          onAdFailedToLoad: (error) {
             // ad.dispose();
-            print("resume builder Interstitial Ad Has Failed To Load because $error");
-
+            print(
+                "resume builder Interstitial Ad Has Failed To Load because $error");
           },
         ));
-
   }
 
   // Future<bool> loadRewardedAd() async {
@@ -95,5 +72,4 @@ class CreateAd{
   //   );
   //   return isRewardEarned;
   // }
-
 }

@@ -553,6 +553,9 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           leading: IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              splashRadius: 10,
               onPressed: () {
                 MySingleton.resumeId = null;
                 Navigator.pushReplacementNamed(context, Routes.homescreen);
@@ -576,6 +579,9 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
           actions: [
             //Menu Button
             IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                splashRadius: 18,
                 onPressed: () {
                   showSimpleDialog(context);
                 },
@@ -604,16 +610,22 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
           children: tabsViewList(),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomSheet: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _getSkipButton(),
-              _getNextButton(),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
+        bottomNavigationBar: Container(
+          color: Colors.white,
+          child: SafeArea(
+            top: false,
+            left: false,
+            right: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _getSkipButton(),
+                _getNextButton(),
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -627,40 +639,45 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
       required inactiveIc}) {
     return Tab(
         iconMargin: EdgeInsets.zero,
-        child: MySingleton.currentIndex == pos
-            ? Column(
-                children: [
-                  SvgPicture.asset(
-                    activeIc,
-                    fit: BoxFit.fill,
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    title,
-                    style: TextStyle(
-                        color: ColorManager.secondary, fontSize: FontSize.s10),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  SvgPicture.asset(Assets.imagesTabActiveBar),
-                ],
-              )
-            : Column(
-                children: [
-                  SvgPicture.asset(inactiveIc),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Text(
-                    title,
-                    style:
-                        TextStyle(color: Colors.grey, fontSize: FontSize.s10),
-                  ),
-                ],
-              ));
+        child: Semantics(
+          label: '$title Tab',
+          selected: MySingleton.currentIndex == pos,
+          child: MySingleton.currentIndex == pos
+              ? Column(
+                  children: [
+                    SvgPicture.asset(
+                      activeIc,
+                      fit: BoxFit.fill,
+                    ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    Text(
+                      title,
+                      style: TextStyle(
+                          color: ColorManager.secondary,
+                          fontSize: FontSize.s10),
+                    ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    SvgPicture.asset(Assets.imagesTabActiveBar),
+                  ],
+                )
+              : Column(
+                  children: [
+                    SvgPicture.asset(inactiveIc),
+                    SizedBox(
+                      height: 4,
+                    ),
+                    Text(
+                      title,
+                      style:
+                          TextStyle(color: Colors.grey, fontSize: FontSize.s10),
+                    ),
+                  ],
+                ),
+        ));
   }
 
   Widget _getSkipButton() {
@@ -685,13 +702,17 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
                 borderRadius: BorderRadius.circular(80.0)),
           ),
           // padding: EdgeInsets.all(0.0),
-          child: Container(
-            // constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-            alignment: Alignment.center,
-            child: Text(
-              AppStrings.skip,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: FontSize.s20),
+          child: Semantics(
+            button: true,
+            label: 'Skip Step',
+            child: Container(
+              // constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+              alignment: Alignment.center,
+              child: Text(
+                AppStrings.skip,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: FontSize.s20),
+              ),
             ),
           ),
         ),
@@ -712,13 +733,17 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
         ),
         // padding: EdgeInsets.all(0.0),
-        child: Container(
-          // constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-          alignment: Alignment.center,
-          child: Text(
-            AppStrings.next,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: FontSize.s20),
+        child: Semantics(
+          button: true,
+          label: 'Next Step',
+          child: Container(
+            // constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+            alignment: Alignment.center,
+            child: Text(
+              AppStrings.next,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: FontSize.s20),
+            ),
           ),
         ),
       ),

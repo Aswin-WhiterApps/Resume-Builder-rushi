@@ -6,6 +6,7 @@ import '../resources/color_manager.dart';
 import '../resources/font_manager.dart';
 import '../resources/route_manager.dart';
 import '../resources/values_manager.dart';
+
 class Promo2View extends StatelessWidget {
   const Promo2View({super.key});
 
@@ -17,13 +18,15 @@ class Promo2View extends StatelessWidget {
       ),
     );
   }
-  void _getSubscription(BuildContext context){
+
+  void _getSubscription(BuildContext context) {
     Navigator.of(context).pushReplacementNamed(Routes.subscriptionPage);
   }
-  Widget _getPromo2(BuildContext context){
+
+  Widget _getPromo2(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: AppPadding.p20),
-      height: MediaQuery.of(context).size.height*0.75 ,
+      // height: MediaQuery.of(context).size.height*0.75 ,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -85,14 +88,14 @@ class Promo2View extends StatelessWidget {
                               ),
                               Center(
                                   child: Text(
-                                    "Premium Templates",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: FontSize.s27,
-                                    ),
-                                  )),
+                                "Premium Templates",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: FontSize.s27,
+                                ),
+                              )),
                               SizedBox(
                                 height: 10,
                               ),
@@ -124,8 +127,8 @@ class Promo2View extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () => _getSubscription(context),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
                     child: Text(
                       "UPGRADE NOW",
                       style: TextStyle(
@@ -141,7 +144,9 @@ class Promo2View extends StatelessWidget {
                     "Upgrade | Elevate | Enjoy",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold,letterSpacing: 3),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 3),
                   ),
                   SizedBox(
                     height: 20,

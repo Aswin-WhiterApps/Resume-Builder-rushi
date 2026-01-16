@@ -45,8 +45,16 @@ class PdfGenerator {
             .buffer
             .asUint8List());
     IntroModel? introModel = await DbHelper.instance.getIntro("1");
-    if (introModel != null) {
-      profileImage = MemoryImage(File(introModel.imagePath!).readAsBytesSync());
+    if (introModel != null && introModel.imagePath != null && introModel.imagePath!.isNotEmpty) {
+      try {
+        final imageFile = File(introModel.imagePath!);
+        if (await imageFile.exists()) {
+          profileImage = MemoryImage(await imageFile.readAsBytes());
+        }
+      } catch (e) {
+        print('Error loading profile image: $e');
+        // Use default profile image or continue without image
+      }
     }
 
     // profileImage = MemoryImage(

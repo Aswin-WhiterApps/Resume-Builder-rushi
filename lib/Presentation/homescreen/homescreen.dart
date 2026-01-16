@@ -14,7 +14,6 @@ import 'package:resume_builder/Presentation/resources/values_manager.dart';
 import 'package:resume_builder/Presentation/resume_builder/resume_builder.dart';
 import 'package:resume_builder/auth/auth.dart';
 import 'package:resume_builder/constants/colours.dart';
-import 'package:resume_builder/google_ads/ads.dart';
 import 'package:resume_builder/google_ads/adunits.dart';
 import 'package:resume_builder/model/model.dart';
 import 'package:resume_builder/screens/AtsCheckingScreen.dart';
@@ -61,6 +60,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   GlobalKey floatingKey = LabeledGlobalKey("Floating");
   bool isFloatingOpen = false;
   late OverlayEntry floating;
+  final ScrollController _scrollController = ScrollController();
+  bool _isScrolled = false;
   List<IntroModel?> introList = [];
 
   Future<void> _getStoragePermission() async {
@@ -73,6 +74,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _getAllResumes();
     _getCurrentUserDetails();
     // loadBanner moved to didChangeDependencies
@@ -81,6 +83,18 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     print("CurrentUserUID = ${MySingleton.loggedInUser?.uid}");
     print("CurrentUserSubscribed = ${MySingleton.loggedInUser?.subscribed}");
     _getStoragePermission();
+  }
+
+  void _onScroll() {
+    if (_scrollController.offset > 10 && !_isScrolled) {
+      setState(() {
+        _isScrolled = true;
+      });
+    } else if (_scrollController.offset <= 10 && _isScrolled) {
+      setState(() {
+        _isScrolled = false;
+      });
+    }
   }
 
   @override
@@ -107,8 +121,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _bannerAd?.dispose();
-    CreateAd.homescreenBanner.dispose();
+    _bannerAd = null;
     super.dispose();
   }
 
@@ -116,41 +131,77 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   bool adLoaded = false;
   BannerAd? _bannerAd;
 
-  void loadBanner() async {
+  void loadBanner({int attempt = 0}) async {
     if (adLoaded || _isAdLoading) return;
+
+    // Check if the user is subscribed before attempting to load
+    bool isSubscribed = MySingleton.loggedInUser?.subscribed ?? false;
+    if (isSubscribed) return;
+
     _isAdLoading = true;
 
-    // Get an AnchoredAdaptiveBannerAdSize.
-    final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-            MediaQuery.of(context).size.width.truncate());
+    try {
+      // Get an AnchoredAdaptiveBannerAdSize.
+      final AnchoredAdaptiveBannerAdSize? size =
+          await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+              MediaQuery.of(context).size.width.truncate());
 
-    if (size == null) {
-      print('Unable to get height of anchored banner.');
-      _isAdLoading = false;
-      return;
-    }
+      AdSize finalSize = size ?? AdSize.banner;
 
-    _bannerAd = BannerAd(
-        size: size,
-        adUnitId: AdUnitId.homeScreenBanner,
-        listener: BannerAdListener(onAdLoaded: (ad) {
-          print("Homescreen Banner Ad Has been Loaded");
-          setState(() {
-            adLoaded = true;
-          });
-        }, onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          print("Homescreen Banner Ad Has Failed To Load because $error");
+      if (size == null) {
+        print(
+            'Unable to get height of anchored banner, falling back to standard banner.');
+      }
+
+      _bannerAd = BannerAd(
+          size: finalSize,
+          adUnitId: AdUnitId.homeScreenBanner,
+          listener: BannerAdListener(onAdLoaded: (ad) {
+            print("Homescreen Banner Ad Has been Loaded");
+            if (mounted) {
+              setState(() {
+                adLoaded = true;
+                _isAdLoading = false;
+              });
+            }
+          }, onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            _bannerAd = null;
+            print("Homescreen Banner Ad Has Failed To Load because $error");
+
+            if (mounted) {
+              setState(() {
+                adLoaded = false;
+                _isAdLoading = false;
+              });
+
+              // Retry logic: try again after a delay if it's not a terminal error
+              // Limit retries to 3 times to avoid infinite loops
+              if (attempt < 3) {
+                print("Retrying ad load in 5 seconds (attempt ${attempt + 1})");
+                Future.delayed(const Duration(seconds: 5), () {
+                  if (mounted) {
+                    loadBanner(attempt: attempt + 1);
+                  }
+                });
+              }
+            }
+          }),
+          request: const AdRequest())
+        ..load();
+    } catch (e) {
+      print("Error creating/loading BannerAd: $e");
+      if (mounted) {
+        setState(() {
           _isAdLoading = false;
-        }),
-        request: AdRequest())
-      ..load();
-    print("BANNER AD = > $_bannerAd");
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -159,59 +210,102 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       child: Scaffold(
         backgroundColor: blue_background,
         appBar: AppBar(
-          leading: InkWell(
-            onTap: () async {
-              setState(() {
-                showSimpleDialog(context);
-              });
-            },
-            child: SvgPicture.asset(
-              ImageAssets.menuIc,
-              fit: BoxFit.scaleDown,
+          leading: Container(
+            width: 32,
+            height: 32, 
+            child: InkWell(
+              borderRadius: BorderRadius.circular(40),
+              onTap: () async {
+                setState(() {
+                  showSimpleDialog(context);
+                });
+              },
+              child: Center(
+                child: SvgPicture.asset(
+                  ImageAssets.menuIc,
+                  fit: BoxFit.scaleDown,
+                  width: 18, // Further reduced icon size
+                  height: 18,
+                  colorFilter: _isScrolled
+                      ? ColorFilter.mode(ColorManager.white, BlendMode.srcIn)
+                      : null,
+                ),
+              ),
             ),
           ),
           centerTitle: true,
-          backgroundColor: Colors.transparent,
+          backgroundColor:
+              _isScrolled ? ColorManager.secondary : Colors.transparent,
           elevation: AppSize.s0,
           systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: ColorManager.white,
-            statusBarBrightness: Brightness.dark,
-            statusBarIconBrightness: Brightness.dark,
+            statusBarColor:
+                _isScrolled ? ColorManager.secondary : Colors.transparent,
+            statusBarBrightness:
+                _isScrolled ? Brightness.light : Brightness.dark,
+            statusBarIconBrightness:
+                _isScrolled ? Brightness.light : Brightness.dark,
           ),
           title: Text(
             "${AppStrings.appBarTitle}",
             style: TextStyle(
-                color: ColorManager.secondary,
+                color:
+                    _isScrolled ? ColorManager.white : ColorManager.secondary,
                 fontSize: FontSize.s20,
                 fontWeight: FontWeight.bold),
           ),
           actions: [
             IconButton(
+                padding: EdgeInsets.all(10),
+                constraints: const BoxConstraints(),
+                splashRadius: 18,
                 onPressed: () async {
                   _showLogoutDialog();
                 },
+                tooltip: 'Logout',
                 icon: Icon(
                   Icons.power_settings_new_outlined,
-                  color: ColorManager.secondary,
+                  color:
+                      _isScrolled ? ColorManager.white : ColorManager.secondary,
+                  semanticLabel: 'Logout Button',
                 ))
           ],
         ),
-        bottomSheet: MySingleton.loggedInUser!.subscribed! == false
-            ? adLoaded && _bannerAd != null
-                ? SizedBox(
-                    width: _bannerAd!.size.width.toDouble(),
-                    height: _bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: _bannerAd!))
-                : Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 50, // Default height placeholder
-                    child: Align(
-                        alignment: Alignment.center,
-                        child: Text("Loading Ad...")),
+        bottomNavigationBar:
+            (MySingleton.loggedInUser?.subscribed ?? false) == false &&
+                    (adLoaded || _isAdLoading)
+                ? Container(
+                    color: Colors.white,
+                    child: SafeArea(
+                      top: false,
+                      left: false,
+                      right: false,
+                      child: adLoaded && _bannerAd != null
+                          ? Container(
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              height: _bannerAd!.size.height.toDouble(),
+                              child: AdWidget(ad: _bannerAd!))
+                          : Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 50,
+                              child: const Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2)),
+                                    SizedBox(width: 10),
+                                    Text("Loading Ad..."),
+                                  ],
+                                ),
+                              ),
+                            ),
+                    ),
                   )
-            : Container(
-                height: 0,
-              ),
+                : null,
         body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -225,63 +319,62 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             builder: (BuildContext context,
                 AsyncSnapshot<List<ResumeModel>> snapshot) {
               if (snapshot.hasData) {
+                final isSubscribed =
+                    MySingleton.loggedInUser?.subscribed ?? false;
                 return Container(
-                  child: MySingleton.loggedInUser!.subscribed!
+                  child: isSubscribed
                       ? GridView.count(
+                          controller: _scrollController,
                           crossAxisCount: 2,
                           crossAxisSpacing: 4.0,
                           mainAxisSpacing: 4.0,
+                          childAspectRatio: 0.85,
                           shrinkWrap: true,
+                          physics: AlwaysScrollableScrollPhysics(),
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(14.0),
                               child: _getNewResumeBtn(),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(14.0),
                               child: _getAtsCheckingBtn(),
                             ),
                             if (snapshot.data != null &&
                                 snapshot.data!.isNotEmpty)
                               for (int i = 0; i < snapshot.data!.length; i++)
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(14.0),
                                   child:
                                       _getResumeListItem(snapshot.data![i], i),
                                 ),
                           ],
                         )
-                      : Column(
+                      : GridView.count(
+                          controller: _scrollController,
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 4.0,
+                          childAspectRatio: 0.85,
+                          shrinkWrap: true,
+                          physics: AlwaysScrollableScrollPhysics(),
                           children: [
-                            Flexible(
-                              child: GridView.count(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 4.0,
-                                mainAxisSpacing: 4.0,
-                                shrinkWrap: true,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(14.0),
-                                    child: _getNewResumeBtn(),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(14.0),
-                                    child: _getAtsCheckingBtn(),
-                                  ),
-                                  if (snapshot.data != null &&
-                                      snapshot.data!.isNotEmpty)
-                                    for (int i = 0;
-                                        i < snapshot.data!.length;
-                                        i++)
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: _getResumeListItem(
-                                            snapshot.data![i], i),
-                                      ),
-                                ],
-                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child: _getNewResumeBtn(),
                             ),
-                            SizedBox(height: 70),
+                            Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child: _getAtsCheckingBtn(),
+                            ),
+                            if (snapshot.data != null &&
+                                snapshot.data!.isNotEmpty)
+                              for (int i = 0; i < snapshot.data!.length; i++)
+                                Padding(
+                                  padding: const EdgeInsets.all(14.0),
+                                  child:
+                                      _getResumeListItem(snapshot.data![i], i),
+                                ),
                           ],
                         ),
                 );
@@ -571,49 +664,52 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   }
 
   _showDeleteDialog(BuildContext context, {required String id}) {
-    Widget cancelButton = TextButton(
-      child: const Text("Cancel", style: TextStyle(color: Colors.black)),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    Widget deleteButton = TextButton(
-      child: Text(
-        "${AppStrings.delete.toUpperCase()}",
-        style: TextStyle(color: ColorManager.primary),
-      ),
-      onPressed: () async {
-        final userId = MySingleton.userId;
-        if (userId == null) {
-          print("Cannot delete: not logged in.");
-          if (mounted) Navigator.pop(context);
-          return;
-        }
-        await _fireUser.deleteResume(userId: userId, resumeId: id);
-        _getAllResumes();
-
-        if (mounted) {
-          Navigator.pop(context);
-        }
-      },
-    );
-
-    AlertDialog alert = AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-      title: const Text("Are You Sure?", style: TextStyle(color: Colors.black)),
-      content: const Text(
-          "This action cannot be undone. Tap 'DELETE' to confirm.",
-          style: TextStyle(color: Colors.black)),
-      actions: [
-        cancelButton,
-        deleteButton,
-      ],
-    );
+    if (!mounted) return;
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return alert;
+      builder: (dialogContext) {
+        Widget cancelButton = TextButton(
+          child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+          onPressed: () {
+            if (Navigator.canPop(dialogContext)) {
+              Navigator.pop(dialogContext);
+            }
+          },
+        );
+        Widget deleteButton = TextButton(
+          child: Text(
+            "${AppStrings.delete.toUpperCase()}",
+            style: TextStyle(color: ColorManager.error),
+          ),
+          onPressed: () async {
+            final userId = MySingleton.userId;
+            if (userId == null) {
+              print("Cannot delete: not logged in.");
+              if (Navigator.canPop(dialogContext)) Navigator.pop(dialogContext);
+              return;
+            }
+            await _fireUser.deleteResume(userId: userId, resumeId: id);
+            _getAllResumes();
+
+            if (Navigator.canPop(dialogContext)) {
+              Navigator.pop(dialogContext);
+            }
+          },
+        );
+
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          title: const Text("Are You Sure?",
+              style: TextStyle(color: Colors.black)),
+          content: const Text(
+              "This action cannot be undone. Tap 'DELETE' to confirm.",
+              style: TextStyle(color: Colors.black)),
+          actions: [
+            cancelButton,
+            deleteButton,
+          ],
+        );
       },
     );
   }
@@ -633,7 +729,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   }
 
   Widget _getNewResumeBtn() {
-    return InkWell(
+    return ScaleButton(
       onTap: createNewResume,
       child: Container(
         decoration: BoxDecoration(
@@ -650,7 +746,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
               height: 45,
               width: 45,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Text(
@@ -664,7 +760,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   }
 
   Widget _getAtsCheckingBtn() {
-    return InkWell(
+    return ScaleButton(
       onTap: () {
         Navigator.push(
           context,
@@ -682,12 +778,12 @@ class _HomeScreenViewState extends State<HomeScreenView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.analytics_outlined,
               color: Colors.white,
               size: 45,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Text(
@@ -721,78 +817,89 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
-        return PopupMenuButton(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          padding: EdgeInsets.zero,
-          position: PopupMenuPosition.under,
-          onOpened: () {
-            setState(() {
-              backColor = ColorManager.secondary;
-              textColor = ColorManager.white;
-              icon = ImageAssets.docWhiteIc;
-            });
-          },
-          onCanceled: () {
-            setState(() {
-              icon = ImageAssets.docGradientIc;
-              backColor = Colors.white;
-              textColor = ColorManager.primary;
-            });
-          },
-          icon: Container(
-            width: MediaQuery.of(context).size.width * 0.40,
-            padding: EdgeInsets.symmetric(horizontal: 25),
-            margin: EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: backColor,
-              border: Border.all(
-                color: ColorManager.secondary,
-                width: 3,
-                strokeAlign: BorderSide.strokeAlignOutside,
-              ),
-              boxShadow: [BoxShadow(color: Colors.black38)],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(icon, fit: BoxFit.scaleDown),
-                SizedBox(height: 15),
-                Text(
-                  resumeTitle,
-                  style: TextStyle(fontSize: FontSize.s16, color: textColor),
+        return Material(
+          
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          clipBehavior: Clip.antiAlias,
+          child: PopupMenuButton(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            padding: EdgeInsets.zero,
+            position: PopupMenuPosition.under,
+            onOpened: () {
+              setState(() {
+                backColor = ColorManager.secondary;
+                textColor = ColorManager.white;
+                icon = ImageAssets.docWhiteIc;
+              });
+            },
+            onCanceled: () {
+              setState(() {
+                icon = ImageAssets.docGradientIc;
+                backColor = Colors.white;
+                textColor = ColorManager.secondary;
+              });
+            },
+            onSelected: (String value) => value,
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => _getCurrentUserDetails()
+                            .then((_) => _getResumeById(resume.id)),
+                        child: Text("Edit",
+                            style: TextStyle(color: ColorManager.secondary)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _deleteResume(context, resume.id);
+                          Navigator.pop(context);
+                        },
+                        child:
+                            Text("Delete", style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-          itemBuilder: (context) {
-            return [
-              PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ];
+            },
+            child: Ink(
+              decoration: BoxDecoration(
+                color: backColor,
+                border: Border.all(
+                  color: ColorManager.secondary,
+                  width: 3,
+                ),
+                boxShadow: const [BoxShadow(color: Colors.black38)],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                height: double.infinity, // Take full height of GridView cell
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                margin: const EdgeInsets.symmetric(vertical: 0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextButton(
-                      onPressed: () => _getCurrentUserDetails()
-                          .then((_) => _getResumeById(resume.id)),
-                      child: Text("Edit",
-                          style: TextStyle(color: ColorManager.secondary)),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        _deleteResume(context, resume.id);
-                        Navigator.pop(context);
-                      },
-                      child:
-                          Text("Delete", style: TextStyle(color: Colors.red)),
+                    SvgPicture.asset(icon, fit: BoxFit.scaleDown),
+                    const SizedBox(height: 15),
+                    Text(
+                      resumeTitle,
+                      style:
+                          TextStyle(fontSize: FontSize.s16, color: textColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-            ];
-          },
-          onSelected: (String value) => value,
+            ),
+          ),
         );
       },
     );
@@ -804,5 +911,56 @@ class _HomeScreenViewState extends State<HomeScreenView> {
           const Duration(seconds: 0), () => _showDeleteDialog(context, id: id));
     });
     print("Resume $id");
+  }
+}
+
+class ScaleButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const ScaleButton({Key? key, required this.child, required this.onTap})
+      : super(key: key);
+
+  @override
+  _ScaleButtonState createState() => _ScaleButtonState();
+}
+
+class _ScaleButtonState extends State<ScaleButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+        _controller.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: widget.child,
+      ),
+    );
   }
 }

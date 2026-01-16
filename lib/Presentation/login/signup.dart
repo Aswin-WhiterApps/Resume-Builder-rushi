@@ -12,6 +12,7 @@ import 'package:resume_builder/blocs/auth/auth_bloc.dart';
 import 'package:resume_builder/blocs/auth/auth_event.dart';
 import 'package:resume_builder/blocs/auth/auth_state.dart';
 import 'package:resume_builder/constants/colours.dart';
+import 'package:resume_builder/utils/navigation_helper.dart';
 
 import 'package:wc_form_validators/wc_form_validators.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,21 +41,30 @@ class _SignupViewState extends State<SignupView> {
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthLoading) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => const Center(
-                  child: SpinKitFadingCircle(
-                color: Colors.blue,
-                size: 50.0,
-              )),
+            NavigationHelper.safeShowAuthDialog(
+              context,
+              const Center(
+                child: SpinKitFadingCircle(
+                  color: Colors.blue,
+                  size: 50.0,
+                ),
+              ),
             );
           } else {
-            Navigator.of(context, rootNavigator: true).pop();
+            NavigationHelper.safeRemoveAuthDialog(context);
           }
 
           if (state is AuthAuthenticated) {
-            Navigator.pushReplacementNamed(context, Routes.homescreen);
+            // Check if Navigator has routes before attempting navigation
+            if (Navigator.canPop(context)) {
+              Navigator.pushReplacementNamed(context, Routes.homescreen);
+            } else {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.homescreen,
+                (route) => false,
+              );
+            }
           } else if (state is AuthError) {
             _showAlertDialog(context, message: state.message);
           }
@@ -118,8 +128,16 @@ class _SignupViewState extends State<SignupView> {
                                       fontFamily: FontFamily.roboto)),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pushReplacementNamed(
-                                      context, Routes.loginPage);
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.pushReplacementNamed(
+                                        context, Routes.loginPage);
+                                  } else {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      Routes.loginPage,
+                                      (route) => false,
+                                    );
+                                  }
                                 },
                                 child: const Text("Sign In",
                                     style: TextStyle(color: Colors.blue)),
@@ -233,11 +251,11 @@ class _SignupViewState extends State<SignupView> {
       ),
       child: Text(
         AppStrings.signUp,
-        textScaleFactor: 1.5,
         style: TextStyle(
           fontFamily: FontFamily.roboto,
           color: Colors.white,
           fontWeight: FontWeight.w500,
+          fontSize: FontSize.s16 * 1.5,
         ),
       ),
     );
@@ -281,15 +299,20 @@ class _SignupViewState extends State<SignupView> {
   }
 
   void _showAlertDialog(BuildContext context, {required String message}) {
+    if (!mounted) return;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Alert"),
         content: Text(message),
         actions: [
           TextButton(
             child: const Text("OK"),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              if (Navigator.canPop(dialogContext)) {
+                Navigator.pop(dialogContext);
+              }
+            },
           ),
         ],
       ),

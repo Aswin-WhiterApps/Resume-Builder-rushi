@@ -9,6 +9,7 @@ import '../../resources/font_manager.dart';
 import '../../resources/strings_manager.dart';
 import '../../resources/style_manager.dart';
 import '../../resources/values_manager.dart';
+import '../../../utils/image_loader.dart';
 
 class SignTabView extends StatefulWidget {
   SignTabView({super.key});
@@ -168,7 +169,10 @@ class _SignTabViewState extends State<SignTabView> {
             fit: StackFit.expand,
             children: [
               // Display the image directly from the network URL.
-              Image.network(_signatureUrl!, fit: BoxFit.cover),
+              ImageLoader.loadNetworkImage(
+                _signatureUrl!, 
+                fit: BoxFit.cover,
+              ),
               Positioned(
                 top: 10,
                 right: 10,

@@ -144,7 +144,13 @@ class Template27 {
         if (await imageFile.exists()) {
           imageFutures.add(imageFile
               .readAsBytes()
-              .then((bytes) => profileImage = MemoryImage(bytes)));
+              .then((bytes) => profileImage = MemoryImage(bytes))
+              .catchError((e) {
+                print("Template27: Failed to read profile image file ${introData!.imagePath}: $e");
+                return MemoryImage(Uint8List(0)); // Return empty image as fallback
+              }));
+        } else {
+          print("Template27: Profile image file does not exist: ${introData!.imagePath}");
         }
       }
 

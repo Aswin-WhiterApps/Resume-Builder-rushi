@@ -19,7 +19,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
       // getSharedData();
-    // TODO: implement initState
     super.initState();
     
     // Initialize AI services in the background
