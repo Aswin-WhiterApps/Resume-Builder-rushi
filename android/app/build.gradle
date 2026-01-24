@@ -23,12 +23,12 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.whiterapps.resume_builder"
+    namespace "com.appsait.resume_builder"
     compileSdkVersion 36
     ndkVersion "27.0.12077973"
 
     defaultConfig {
-        applicationId "com.whiterapps.resume_builder"
+        applicationId "com.appsait.resume_builder"
         minSdkVersion 24
         targetSdkVersion 36
         versionCode 7

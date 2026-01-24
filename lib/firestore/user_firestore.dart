@@ -110,6 +110,25 @@ class FireUser {
     }
   }
 
+  Future<void> updateResumeTitle({
+    required String userId,
+    required String resumeId,
+    required String title,
+  }) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('resumes')
+          .doc(resumeId)
+          .update({'title': title});
+      print("✅ Resume title updated successfully: $title");
+    } catch (e) {
+      print("❌ Error updating resume title: $e");
+      rethrow;
+    }
+  }
+
   Future<List<ResumeModel>> getResumesForUser(String userId) async {
     try {
       final snapshot = await _firestore

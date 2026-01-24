@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
 
 class Auth {
   FirebaseAuth get _firebaseAuth => FirebaseAuth.instance;
@@ -25,17 +26,24 @@ class Auth {
     await _firebaseAuth.signOut();
   }
 
-  GoogleSignIn get _googleSignIn => GoogleSignIn();
-  GoogleSignInAccount? gUser;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId:
+        "630791257688-bb1fkmr9t6nf2k4ddbv7e2dpbq0aprf9.apps.googleusercontent.com",
+  );
+  GoogleSignInAccount? _gUser;
   signInWithGoogle() async {
-    gUser = await _googleSignIn.signIn();
+    _gUser = await _googleSignIn.signIn();
+    if (_gUser == null) {
+      debugPrint('Google Sign-In cancelled or failed');
+      return null;
+    }
 
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+    final GoogleSignInAuthentication gAuth = await _gUser!.authentication;
 
     final credential = GoogleAuthProvider.credential(
         accessToken: gAuth.accessToken, idToken: gAuth.idToken);
-    gid = gUser!.id;
-    gEmail = gUser!.email;
+    gid = _gUser!.id;
+    gEmail = _gUser!.email;
 
     return await _firebaseAuth.signInWithCredential(credential);
   }

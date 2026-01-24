@@ -1,4 +1,4 @@
-package com.whiterapps.resume_builder
+package com.appsait.resume_builder
 
 import io.flutter.embedding.android.FlutterActivity
 

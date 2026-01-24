@@ -212,7 +212,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
         appBar: AppBar(
           leading: Container(
             width: 32,
-            height: 32, 
+            height: 32,
             child: InkWell(
               borderRadius: BorderRadius.circular(40),
               onTap: () async {
@@ -632,9 +632,13 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       return;
     }
     try {
+      final snapshot = await _fireUser.getResumesForUser(userId);
+      final int nextIndex = snapshot.length + 1;
+      final String defaultTitle = "Resume $nextIndex";
+
       final String? newResumeId = await _fireUser.createNewResume(
         userId: userId,
-        title: "My New Resume",
+        title: defaultTitle,
       );
 
       if (newResumeId == null) {
@@ -813,12 +817,15 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     Color textColor = ColorManager.secondary;
     String icon = ImageAssets.docGradientIc;
 
-    final resumeTitle = "Resume ${index + 1}";
+    // Display stored title, or fallback to index-based naming for untitled/legacy resumes
+    String resumeTitle = resume.title ?? "Resume ${index + 1}";
+    if (resumeTitle == "My New Resume") {
+      resumeTitle = "Resume ${index + 1}";
+    }
 
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
         return Material(
-          
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           clipBehavior: Clip.antiAlias,
@@ -850,6 +857,14 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close PopupMenu first
+                          _showRenameDialog(context, resume);
+                        },
+                        child: Text("Rename",
+                            style: TextStyle(color: ColorManager.primary)),
+                      ),
+                      TextButton(
                         onPressed: () => _getCurrentUserDetails()
                             .then((_) => _getResumeById(resume.id)),
                         child: Text("Edit",
@@ -857,8 +872,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                       ),
                       TextButton(
                         onPressed: () {
+                          Navigator.pop(context); // Close PopupMenu first
                           _deleteResume(context, resume.id);
-                          Navigator.pop(context);
                         },
                         child:
                             Text("Delete", style: TextStyle(color: Colors.red)),
@@ -911,6 +926,55 @@ class _HomeScreenViewState extends State<HomeScreenView> {
           const Duration(seconds: 0), () => _showDeleteDialog(context, id: id));
     });
     print("Resume $id");
+  }
+
+  void _showRenameDialog(BuildContext context, ResumeModel resume) {
+    final TextEditingController controller =
+        TextEditingController(text: resume.title);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text("Rename Resume"),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: "Enter new name",
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child:
+                  const Text("Cancel", style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () async {
+                final newTitle = controller.text.trim();
+                if (newTitle.isNotEmpty && newTitle != resume.title) {
+                  final userId = MySingleton.userId;
+                  if (userId != null) {
+                    await _fireUser.updateResumeTitle(
+                      userId: userId,
+                      resumeId: resume.id,
+                      title: newTitle,
+                    );
+                    _getAllResumes();
+                  }
+                }
+                Navigator.pop(context);
+              },
+              child: Text("Rename",
+                  style: TextStyle(color: ColorManager.secondary)),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
