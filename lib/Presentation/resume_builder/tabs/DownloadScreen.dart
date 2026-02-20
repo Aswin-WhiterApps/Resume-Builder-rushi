@@ -54,7 +54,7 @@ class DownloadScreen extends StatelessWidget {
       final atsResult = await ATSCheckingService.instance.analyzeResume(
         resumeContent: 'Resume content placeholder for analysis',
         jobDescription: null,
-        pdfFile: resumePdf,
+        resumeFile: resumePdf,
         comprehensiveData: null,
       );
 

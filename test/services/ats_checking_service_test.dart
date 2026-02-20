@@ -60,7 +60,7 @@ void main() {
       final result = await atsCheckingService.analyzeResume(
         resumeContent: resumeContent,
         jobDescription: jobDescription,
-        pdfFile: dummyFile,
+        resumeFile: dummyFile,
       );
 
       // ASSERT
@@ -96,7 +96,7 @@ void main() {
       final result = await atsCheckingService.analyzeResume(
         resumeContent: resumeContent,
         jobDescription: jobDescription,
-        pdfFile: dummyFile,
+        resumeFile: dummyFile,
       );
 
       // ASSERT
@@ -130,7 +130,7 @@ void main() {
       final result = await atsCheckingService.analyzeResume(
         resumeContent: resumeContent,
         jobDescription: jobDescription,
-        pdfFile: dummyFile,
+        resumeFile: dummyFile,
       );
 
       // ASSERT

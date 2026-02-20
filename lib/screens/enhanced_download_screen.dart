@@ -372,7 +372,7 @@ class _EnhancedDownloadScreenState extends State<EnhancedDownloadScreen> {
       final atsResult = await ATSCheckingService.instance.analyzeResume(
         resumeContent: resumeContent,
         jobDescription: widget.resumeData['jobDescription'],
-        pdfFile: _generatedPdfFile!,
+        resumeFile: _generatedPdfFile!,
         comprehensiveData:
             _comprehensiveData, // Pass comprehensive data for enhanced analysis
       );

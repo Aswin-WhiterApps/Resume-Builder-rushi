@@ -773,15 +773,8 @@ class _ResumeBuilderViewState extends State<ResumeBuilderView>
       if (contactState == null) {
         canProceed = false;
       } else {
-        contactState.saveContact(); // Trigger save
-        final email = contactState.emailController.text.trim();
-        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-        if (email.isEmpty || !emailRegex.hasMatch(email)) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("A valid email is required.")),
-            );
-          }
+        // Trigger validation and save. This will show error messages in the UI if invalid.
+        if (!contactState.validateAndSave()) {
           canProceed = false;
         }
       }

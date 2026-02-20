@@ -7,6 +7,8 @@ import 'package:resume_builder/Presentation/resources/values_manager.dart';
 import 'package:resume_builder/screens/AtsResultsScreen.dart';
 import 'package:resume_builder/services/ats_checking_service.dart';
 import 'package:resume_builder/constants/openai_service.dart';
+import 'package:docx_to_text/docx_to_text.dart';
+import 'package:doc_text/doc_text.dart';
 
 class AtsCheckingScreen extends StatefulWidget {
   final File? initialResumeFile;
@@ -22,6 +24,7 @@ class _AtsCheckingScreenState extends State<AtsCheckingScreen> {
   String? _resumeText;
   final TextEditingController _jobDescriptionController =
       TextEditingController();
+  final TextEditingController _jobProfileController = TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -36,7 +39,7 @@ class _AtsCheckingScreenState extends State<AtsCheckingScreen> {
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
+      allowedExtensions: ['pdf', 'doc', 'docx'],
     );
 
     if (result != null) {
@@ -51,13 +54,30 @@ class _AtsCheckingScreenState extends State<AtsCheckingScreen> {
 
   Future<void> _extractTextFromFile(File file) async {
     try {
-      String text = await ReadPdfText.getPDFtext(file.path);
+      final extension = file.path.split('.').last.toLowerCase();
+      String text = "";
+
+      if (extension == 'pdf') {
+        text = await ReadPdfText.getPDFtext(file.path);
+      } else if (extension == 'docx') {
+        final bytes = await file.readAsBytes();
+        text = docxToText(bytes);
+      } else if (extension == 'doc') {
+        text = await DocText().extractTextFromDoc(file.path) ?? "";
+      } else {
+        throw Exception('Unsupported file format: $extension');
+      }
+
+      if (text.trim().isEmpty) {
+        throw Exception('Could not extract text from file');
+      }
+
       setState(() {
         _resumeText = text;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to read PDF: $e')),
+        SnackBar(content: Text('Failed to read file: $e')),
       );
     }
   }
@@ -86,8 +106,9 @@ class _AtsCheckingScreenState extends State<AtsCheckingScreen> {
     try {
       final atsResult = await ATSCheckingService.instance.analyzeResume(
         resumeContent: _resumeText!,
+        jobProfile: _jobProfileController.text,
         jobDescription: _jobDescriptionController.text,
-        pdfFile: _selectedFile!,
+        resumeFile: _selectedFile!,
       );
 
       if (!mounted) return;
@@ -142,7 +163,7 @@ class _AtsCheckingScreenState extends State<AtsCheckingScreen> {
                     Text(
                       _selectedFile != null
                           ? "Selected: ${_selectedFile!.path.split('/').last}"
-                          : "Upload Resume (PDF)",
+                          : "Upload Resume (PDF, DOC, DOCX)",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[700],
@@ -156,6 +177,28 @@ class _AtsCheckingScreenState extends State<AtsCheckingScreen> {
                       ),
                   ],
                 ),
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Job Profile Section
+            Text(
+              "Job Profile",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: ColorManager.black),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _jobProfileController,
+              decoration: InputDecoration(
+                hintText: "Enter job profile name...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.blue[50],
               ),
             ),
             SizedBox(height: 20),

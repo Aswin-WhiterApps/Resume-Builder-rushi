@@ -632,13 +632,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       return;
     }
     try {
-      final snapshot = await _fireUser.getResumesForUser(userId);
-      final int nextIndex = snapshot.length + 1;
-      final String defaultTitle = "Resume $nextIndex";
-
       final String? newResumeId = await _fireUser.createNewResume(
         userId: userId,
-        title: defaultTitle,
+        title: "Resume", // Service will re-order and number this
       );
 
       if (newResumeId == null) {
@@ -817,11 +813,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     Color textColor = ColorManager.secondary;
     String icon = ImageAssets.docGradientIc;
 
-    // Display stored title, or fallback to index-based naming for untitled/legacy resumes
-    String resumeTitle = resume.title ?? "Resume ${index + 1}";
-    if (resumeTitle == "My New Resume") {
-      resumeTitle = "Resume ${index + 1}";
-    }
+    // Display stored title, fallback to "Resume" if null (shouldn't happen with new logic)
+    String resumeTitle = resume.title ?? "Resume";
 
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {

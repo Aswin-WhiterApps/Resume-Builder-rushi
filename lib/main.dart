@@ -34,14 +34,15 @@ Future<void> main() async {
   // Initialize AdMob
   await AdMobService.initialize();
 
-  // Set preferred orientations
+  // Set preferred orientations and UI mode
   try {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   } catch (e) {
-    debugPrint('SystemChrome orientation setting failed: $e');
+    debugPrint('SystemChrome setting failed: $e');
   }
 
   // Initialize Firebase and Crashlytics

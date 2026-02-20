@@ -99,14 +99,62 @@ class FireUser {
           .collection('resumes')
           .add({
         'uid': userId,
-        'title': title,
+        'title': title, // This will be updated by _reorderResumes
         'createdAt': FieldValue.serverTimestamp(),
       });
       print("✅ Resume created in Firestore with ID: ${docRef.id}");
+
+      // Re-order resumes to ensure sequential numbering
+      await _reorderResumes(userId);
+
       return docRef.id;
     } catch (e) {
       print("❌ Error creating new resume: $e");
       return null;
+    }
+  }
+
+  /// Re-orders "Resume X" titles to be sequential based on creation date.
+  Future<void> _reorderResumes(String userId) async {
+    try {
+      final resumesCollection =
+          _firestore.collection('users').doc(userId).collection('resumes');
+
+      final snapshot =
+          await resumesCollection.orderBy('createdAt', descending: false).get();
+
+      final resumeNumberRegex = RegExp(r'^Resume \d+$');
+      int resumeCounter = 1;
+      final batch = _firestore.batch();
+      bool hasChanges = false;
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final String? currentTitle = data['title'];
+
+        // Identify if it's a default/system-generated title
+        bool isDefaultTitle = currentTitle == null ||
+            currentTitle.isEmpty ||
+            currentTitle == "My New Resume" ||
+            currentTitle == "Resume" ||
+            resumeNumberRegex.hasMatch(currentTitle);
+
+        if (isDefaultTitle) {
+          final String expectedTitle = "Resume $resumeCounter";
+          if (currentTitle != expectedTitle) {
+            batch.update(doc.reference, {'title': expectedTitle});
+            hasChanges = true;
+          }
+          resumeCounter++;
+        }
+      }
+
+      if (hasChanges) {
+        await batch.commit();
+        print("✅ Resumes re-ordered successfully for user: $userId");
+      }
+    } catch (e) {
+      print("❌ Error re-ordering resumes: $e");
     }
   }
 
@@ -123,6 +171,10 @@ class FireUser {
           .doc(resumeId)
           .update({'title': title});
       print("✅ Resume title updated successfully: $title");
+
+      // After a manual rename, we should re-order to fill any potential gaps
+      // or fix numbering of other resumes.
+      await _reorderResumes(userId);
     } catch (e) {
       print("❌ Error updating resume title: $e");
       rethrow;
@@ -166,6 +218,9 @@ class FireUser {
 
       await resumeRef.delete();
       print("✅ Successfully deleted resume ID: $resumeId");
+
+      // Re-order resumes after deletion to fill the gap
+      await _reorderResumes(userId);
     } catch (e) {
       print("❌ Error deleting resume ID $resumeId: $e");
     }

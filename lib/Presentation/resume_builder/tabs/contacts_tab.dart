@@ -278,8 +278,10 @@ class ContactsTabViewState extends State<ContactsTabView> {
   }
 
   String? _phoneValidator(String? value) {
-    // Making phone number optional
-    if (value != null && value.isNotEmpty && value.length != 10) {
+    if (value == null || value.trim().isEmpty) {
+      return "Phone number is required";
+    }
+    if (value.trim().length < 10) {
       return "Enter a valid 10-digit phone number";
     }
     return null;
