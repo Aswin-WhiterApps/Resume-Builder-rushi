@@ -31,39 +31,62 @@ class ONNXModelManager {
 
   Future<void> _loadModels() async {
     try {
-      // Check if model files exist before trying to load them
-      final phi3ModelPath = await _getModelPath(
-          'Phi-3-mini-4k-instruct-onnx/phi3-mini-4k-instruct-cpu-int4-rtn-block-32-acc-level-4.onnx',
-          'Phi-3-mini-4k-instruct.onnx');
+      // Load only embedding model (Phi-3 is too large for mobile)
       final embeddingModelPath = await _getModelPath(
           'all-MiniLM-L6-v2-onnx/model.onnx', 'all-MiniLM-L6-v2.onnx');
 
-      // Check if files exist and have content
-      final phi3File = File(phi3ModelPath);
+      // Check if embedding model exists and has content
       final embeddingFile = File(embeddingModelPath);
 
-      if (await phi3File.exists() && await phi3File.length() > 0) {
-        final phi3ModelBytes = await phi3File.readAsBytes();
-        _phi3Session = OrtSession.fromBuffer(
-          phi3ModelBytes,
-          OrtSessionOptions(),
-        );
-        print('✅ Phi-3 model loaded successfully');
+      print('🔍 Checking embedding model at: $embeddingModelPath');
+
+      if (await embeddingFile.exists()) {
+        final fileSize = await embeddingFile.length();
+        print('📁 Embedding file exists, size: ${fileSize} bytes');
+        
+        if (fileSize > 0) {
+          try {
+            final embeddingModelBytes = await embeddingFile.readAsBytes();
+            _embeddingSession = OrtSession.fromBuffer(
+              embeddingModelBytes,
+              OrtSessionOptions(),
+            );
+            print('✅ Embedding model loaded successfully');
+          } catch (e) {
+            print('❌ Failed to load embedding session: $e');
+            print('⚠️ Embedding model file found but session creation failed, using simple similarity calculation');
+          }
+        } else {
+          print('⚠️ Embedding model file is empty, using simple similarity calculation');
+        }
       } else {
-        print('⚠️ Phi-3 model file not found, using template-based generation');
+        print('⚠️ Embedding model file not found at $embeddingModelPath, using simple similarity calculation');
+        print('💡 Attempting to copy from assets...');
+        
+        // Try to force copy from assets
+        try {
+          final modelData = await rootBundle.load('assets/models/all-MiniLM-L6-v2-onnx/model.onnx');
+          await embeddingFile.writeAsBytes(modelData.buffer.asUint8List());
+          print('✅ Embedding model copied from assets successfully');
+          
+          // Retry loading
+          if (await embeddingFile.exists() && await embeddingFile.length() > 0) {
+            final embeddingModelBytes = await embeddingFile.readAsBytes();
+            _embeddingSession = OrtSession.fromBuffer(
+              embeddingModelBytes,
+              OrtSessionOptions(),
+            );
+            print('✅ Embedding model loaded successfully after copy');
+          }
+        } catch (copyError) {
+          print('❌ Failed to copy embedding model from assets: $copyError');
+        }
       }
 
-      if (await embeddingFile.exists() && await embeddingFile.length() > 0) {
-        final embeddingModelBytes = await embeddingFile.readAsBytes();
-        _embeddingSession = OrtSession.fromBuffer(
-          embeddingModelBytes,
-          OrtSessionOptions(),
-        );
-        print('✅ Embedding model loaded successfully');
-      } else {
-        print(
-            '⚠️ Embedding model file not found, using simple similarity calculation');
-      }
+      // Note: Phi-3 model is too large for mobile apps (2.7GB)
+      // Using OpenAI API for text generation instead
+      print('ℹ️ Phi-3 model skipped (too large for mobile). Using OpenAI API for text generation.');
+
     } catch (e) {
       print('⚠️ Model loading failed, using template-based features: $e');
       // Don't throw exception, just log and continue with template-based features

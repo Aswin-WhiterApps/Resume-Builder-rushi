@@ -15,6 +15,7 @@ import 'package:resume_builder/Presentation/resume_builder/resume_builder.dart';
 import 'package:resume_builder/auth/auth.dart';
 import 'package:resume_builder/constants/colours.dart';
 import 'package:resume_builder/google_ads/adunits.dart';
+import 'package:resume_builder/google_ads/admob_service.dart';
 import 'package:resume_builder/model/model.dart';
 import 'package:resume_builder/screens/AtsCheckingScreen.dart';
 import 'package:resume_builder/shared_preference/shared_preferences.dart';
@@ -34,6 +35,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   final User? user = Auth().currentUser;
 
   final FireUser _fireUser = FireUser();
+  InterstitialAd? _atsInterstitialAd;
 
   Future<bool> signOut() async {
     try {
@@ -42,6 +44,51 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     } on FirebaseAuthException catch (error) {
       print("Fire Base Problem :- ${error.message}");
       return false;
+    }
+  }
+
+  // Load ATS interstitial ad
+  void _loadATSInterstitialAd() {
+    AdMobService.loadInterstitialAd(
+      adUnitId: AdUnitId.atsInterstitialAd,
+      onAdLoaded: (InterstitialAd ad) {
+        _atsInterstitialAd = ad;
+        print('✅ ATS Interstitial ad loaded');
+      },
+      onAdFailedToLoad: (LoadAdError error) {
+        print('❌ ATS Interstitial ad failed to load: $error');
+        _atsInterstitialAd = null;
+      },
+    );
+  }
+
+  // Show ATS interstitial ad
+  Future<void> _showATSInterstitialAd() async {
+    if (_atsInterstitialAd == null) {
+      print('⚠️ ATS Interstitial ad not ready, loading...');
+      _loadATSInterstitialAd();
+      // Wait a moment for ad to load, then proceed anyway
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    if (_atsInterstitialAd != null) {
+      _atsInterstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          ad.dispose();
+          _atsInterstitialAd = null;
+          _loadATSInterstitialAd(); // Preload next ad
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          ad.dispose();
+          _atsInterstitialAd = null;
+          _loadATSInterstitialAd(); // Preload next ad
+        },
+      );
+      
+      await _atsInterstitialAd!.show();
+      print('✅ ATS Interstitial ad shown');
+    } else {
+      print('⚠️ ATS Interstitial ad not available, proceeding to ATS screen');
     }
   }
 
@@ -83,6 +130,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
     print("CurrentUserUID = ${MySingleton.loggedInUser?.uid}");
     print("CurrentUserSubscribed = ${MySingleton.loggedInUser?.subscribed}");
     _getStoragePermission();
+    
+    // Initialize ATS interstitial ad
+    _loadATSInterstitialAd();
   }
 
   void _onScroll() {
@@ -123,7 +173,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   void dispose() {
     _scrollController.dispose();
     _bannerAd?.dispose();
+    _atsInterstitialAd?.dispose();
     _bannerAd = null;
+    _atsInterstitialAd = null;
     super.dispose();
   }
 
@@ -761,13 +813,19 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   Widget _getAtsCheckingBtn() {
     return ScaleButton(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const AtsCheckingScreen(),
-          ),
-        );
+      onTap: () async {
+        // Show interstitial ad before navigating to ATS screen
+        await _showATSInterstitialAd();
+        
+        // Navigate to ATS checking screen
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AtsCheckingScreen(),
+            ),
+          );
+        }
       },
       child: Container(
         decoration: BoxDecoration(

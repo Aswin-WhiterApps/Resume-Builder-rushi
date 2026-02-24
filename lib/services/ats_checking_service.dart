@@ -346,13 +346,60 @@ class ATSCheckingService {
       if (results['has_summary'] != true) {
         suggestions.add(
             'Add a professional summary to highlight your key qualifications');
+      } else {
+        final summaryQuality = results['summary_quality'] as String? ?? 'Poor';
+        if (summaryQuality == 'Poor' || summaryQuality == 'Fair') {
+          suggestions.add(
+              'Improve your professional summary with more specific achievements and keywords');
+        }
       }
 
+      if (results['has_work_experience'] != true) {
+        suggestions.add(
+            'Add your work experience to showcase your professional background');
+      } else {
+        final workScore = results['work_experience_score'] as double? ?? 0;
+        if (workScore < 70) {
+          suggestions.add(
+              'Enhance your work experience descriptions with more quantifiable achievements');
+        }
+      }
+
+      if (results['has_education'] != true) {
+        suggestions.add('Include your educational background');
+      }
+
+      if (results['has_skills'] != true) {
+        suggestions.add(
+            'Add a skills section to highlight your technical and soft skills');
+      } else {
+        final skillsScore = results['skills_score'] as double? ?? 0;
+        if (skillsScore < 70) {
+          suggestions.add(
+              'Expand your skills section with more relevant technical skills');
+        }
+      }
+
+      if (results['has_cover_letter'] != true) {
+        suggestions.add(
+            'Consider adding a cover letter to personalize your application');
+      }
+
+      if (results['has_signature'] != true) {
+        suggestions.add('Add a digital signature for a professional touch');
+      }
+
+      // Job description matching suggestions
       if (results.containsKey('missing_keywords') &&
           (results['missing_keywords'] as List).isNotEmpty) {
         final missingKeywords = results['missing_keywords'] as List<String>;
         suggestions.add(
             'Include these relevant keywords: ${missingKeywords.take(5).join(', ')}');
+      }
+    } else {
+      if (results['professional_tone'] != 'Professional') {
+        suggestions
+            .add('Use more professional language throughout your resume');
       }
     }
 
@@ -509,7 +556,7 @@ class ATSCheckingService {
 
       final response = await _aiServiceManager.textService.generateText(
         systemPrompt:
-            'You are a professional ATS resume evaluator. Provide accurate, strict, and highly personalized resume analysis strictly in JSON format. Avoid generic advice and focus on resume-specific weaknesses and measurable achievements.',
+            'You are an expert ATS (Applicant Tracking System) analyst and resume coach. Analyze resumes for ATS compatibility, keyword matching, content quality, and provide actionable improvement suggestions. Return results in a structured format.',
         prompt: analysisPrompt,
         maxTokens: 2000,
       );
@@ -537,10 +584,10 @@ class ATSCheckingService {
 
       final response = await _openAIService.generateText(
         systemPrompt:
-            'You are a professional ATS resume evaluator. Provide accurate, strict, and highly personalized resume analysis strictly in JSON format. Avoid generic advice and focus on resume-specific weaknesses and measurable achievements.',
+            'You are an expert ATS (Applicant Tracking System) analyst and resume coach. Analyze resumes for ATS compatibility, keyword matching, content quality, and provide actionable improvement suggestions. Return results in a structured format.',
         userPrompt: analysisPrompt,
         maxTokens: 2000,
-        temperature: 0.1, // Low temperature for consistent JSON results
+        temperature: 0.3,
       );
 
       return _parseOpenAIResponse(response);
@@ -557,11 +604,11 @@ class ATSCheckingService {
     ComprehensiveResumeData? comprehensiveData,
   }) {
     return '''
-You are a professional ATS resume evaluator. 
+You are a professional ATS (Applicant Tracking System) analyzer.
 
-Carefully analyze the resume content provided below and generate personalized, resume-specific improvement suggestions based only on the actual content present in the resume. 
+Your task is to analyze resumes with high accuracy.
 
-Rules for Analysis:
+You must:
 - Read the entire resume carefully
 - Identify all sections
 - Detect missing or weak sections
@@ -574,12 +621,6 @@ Rules for Analysis:
 - If a section is missing, mark it as "missing"
 - If a section is weak, mark it as "weak"
 - If strong, mark it as "strong"
-- Do not give generic advice. Do not repeat standard suggestions. 
-- Identify real weaknesses, missing measurable achievements, unclear descriptions, weak bullet points, missing keywords from the job description, formatting problems, incomplete contact details, lack of impact metrics, skill gaps, or irrelevant content. 
-- Every improvement suggestion must clearly reference a specific issue found in the resume and explain exactly what should be improved and how to improve it. 
-- If a section is strong, do not suggest improving it unnecessarily. 
-- Avoid generic phrases like “add more details” — instead, specify what details are missing (e.g., quantifiable results, technologies, certifications, leadership examples). 
-- Generate unique suggestions tailored strictly to this resume only.
 
 Be strict and realistic. Do not inflate scores.
 Analyze the following resume for ATS compatibility.
@@ -626,8 +667,7 @@ Return the result strictly in this JSON format:
   "improvement_suggestions": []
 }
 
-Rules for JSON:
-- JSON MUST BE VALID.
+Rules:
 - ATS score must be realistic.
 - If resume lacks measurable achievements, reduce experience_quality score.
 - If keywords from job description are missing, reduce keywords_match score.
